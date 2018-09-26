@@ -15,6 +15,9 @@ Background:
     - the bubbles can bounce off walls
     - High scores
     - Cool music
+    
+  Wireframe:
+    The main idea is to look something like this picture: http://i1-games.softpedia-static.com/screenshots/Bubble-Spinner-2_3.jpg, however if I can be creative perhaps I can alter it a bit.
    
   Technologies:
     I don't expect to need any libraries beyond vanilla JS. THe difficulty will be in creating the physics of the game and the     proper hitboxes of the bubbles.
