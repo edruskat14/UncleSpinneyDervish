@@ -23,6 +23,6 @@ Background:
     Adding a backend would be nice for high scores. This would just require a high scores table involving a name input by the     user and a score.
     
   Timeline:
-    A bubble: the first thing will be to design a bubble itself. This will require various colors, the shape will be round and      the interaction between bubbles will be sticking together on contact.
-    The Board: the second phase will be creating a board which will be a circle of bubble in the center of the screen with          walls around it. The board will shrink and grow as bubbles are eliminated and added.
+    A bubble: the first thing will be to design a bubble itself. This will require various colors, the shape will be round and      the interaction between bubbles will be sticking together on contact.  
+    The Board: the second phase will be creating a board which will be a circle of bubble in the center of the screen with          walls around it. The board will shrink and grow as bubbles are eliminated and added.  
     Actions: The final of the main MVPs will be to create the user's shooting action, the bubble popping action, and the            bubble adding action. The popping will involve gaining points and possibly ending a round. The adding action may lead to      a game over if a bubble touches the side.
