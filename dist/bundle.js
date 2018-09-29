@@ -159,7 +159,7 @@ game.renderAllBubbles();
 function readyToFire() {}
 
 function oneTurn() {
-  game.newActive();
+  game.newReady();
   var help = canvas.addEventListener('click', function () {
     return game.fireBubble(event);
   }, false);
@@ -208,6 +208,7 @@ function () {
     this.ctx = ctx;
     this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
     this.allBubbles = [];
+    this.readyBubble = null;
     this.activeBubble = null;
     this.bubbleRad = 12;
     this.mousePosition = this.mousePosition.bind(this);
@@ -273,10 +274,10 @@ function () {
       });
     }
   }, {
-    key: "newActive",
-    value: function newActive() {
-      this.activeBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(6 * Math.random())]);
-      this.activeBubble.render();
+    key: "newReady",
+    value: function newReady() {
+      this.readyBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(6 * Math.random())]);
+      this.readyBubble.render();
     }
   }, {
     key: "movingBubble",
@@ -366,7 +367,7 @@ function () {
             newBubble.touching.push(oldBubble);
             oldBubble.touching.push(newBubble);
           }
-        } else {
+        } else if (_this5.inContact(oldBubble, newBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble); // if (oldBubble.count >= 1) {
           //   debugger
@@ -391,6 +392,7 @@ function () {
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllBubbles();
+      this.newReady();
     }
   }, {
     key: "mousePosition",
@@ -413,17 +415,21 @@ function () {
     value: function fireBubble(e) {
       var _this6 = this;
 
-      mousePos = this.mousePosition(e);
-      w = mousePos.x - this.canvas.width / 2;
-      h = mousePos.y;
-      denominator = Math.sqrt(w * w + h * h);
-      this.activeBubble.dx = 2 * (w / denominator);
-      this.activeBubble.dy = 2 * (h / denominator);
-      console.log('fire!');
-      this.interval = setInterval(this.dibujar.bind(this), 5);
-      this.canvas.removeEventListener('click', function () {
-        return _this6.fireBubble(event);
-      });
+      if (this.readyBubble) {
+        this.activeBubble = this.readyBubble;
+        this.readyBubble = null;
+        mousePos = this.mousePosition(e);
+        w = mousePos.x - this.canvas.width / 2;
+        h = mousePos.y;
+        denominator = Math.sqrt(w * w + h * h);
+        this.activeBubble.dx = 2 * (w / denominator);
+        this.activeBubble.dy = 2 * (h / denominator);
+        console.log('fire!');
+        this.interval = setInterval(this.dibujar.bind(this), 5);
+        this.canvas.removeEventListener('click', function () {
+          return _this6.fireBubble(event);
+        });
+      }
     }
   }]);
 
