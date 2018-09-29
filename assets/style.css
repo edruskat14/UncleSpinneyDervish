@@ -1,0 +1,16 @@
+.main-body {
+
+}
+.title {
+  font-size: 18px;
+
+}
+.canvas {
+  position: relative;
+  border: 1px solid black;
+  height: 600px;
+  width: 525px;
+  border-radius: 5px;
+  background-color: rgba(235, 235, 235);
+  margin: 0 auto;
+}
