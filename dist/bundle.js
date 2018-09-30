@@ -141,30 +141,21 @@ module.exports = Bubble;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
+var Round = __webpack_require__(/*! ./round */ "./lib/round.js");
 
-console.log('hello');
-console.log('why');
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
 var bubbleRad = 12;
-console.log('yo');
-var game = new Game(canvas, ctx);
-console.log(game);
-game.populateBubbles();
-game.renderAllBubbles();
-
-function readyToFire() {}
+var round = new Round(canvas, ctx, 1);
+round.populateBubbles();
+round.renderAllBubbles();
 
 function oneTurn() {
-  game.newReady();
-  var help = canvas.addEventListener('click', function () {
-    return game.fireBubble(event);
-  }, false);
-  canvas.removeEventListener('click', function () {
-    return game.fireBubble(event);
+  round.newReady();
+  canvas.addEventListener('click', function () {
+    return round.fireBubble(event);
   }, false);
 }
 
@@ -183,10 +174,10 @@ oneTurn(); // function dibujar() {
 
 /***/ }),
 
-/***/ "./lib/game.js":
-/*!*********************!*\
-  !*** ./lib/game.js ***!
-  \*********************/
+/***/ "./lib/round.js":
+/*!**********************!*\
+  !*** ./lib/round.js ***!
+  \**********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -198,14 +189,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
 
-var Game =
+var Round =
 /*#__PURE__*/
 function () {
-  function Game(canvas, ctx) {
-    _classCallCheck(this, Game);
+  function Round(canvas, ctx, multiplier) {
+    _classCallCheck(this, Round);
 
     this.canvas = canvas;
     this.ctx = ctx;
+    this.multiplier = multiplier;
+    this.points = 0;
     this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
     this.allBubbles = [];
     this.readyBubble = null;
@@ -215,7 +208,7 @@ function () {
     this.interval = null;
   }
 
-  _createClass(Game, [{
+  _createClass(Round, [{
     key: "inContact",
     value: function inContact(bubA, bubB) {
       var xDist = bubA.x - bubB.x;
@@ -276,7 +269,7 @@ function () {
   }, {
     key: "newReady",
     value: function newReady() {
-      this.readyBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(6 * Math.random())]);
+      this.readyBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(this.colors.length * Math.random())]);
       this.readyBubble.render();
     }
   }, {
@@ -322,52 +315,154 @@ function () {
       });
     }
   }, {
-    key: "eliminateTree",
-    value: function eliminateTree(bubble) {
+    key: "adjustColorOptions",
+    value: function adjustColorOptions() {
       var _this4 = this;
+
+      containedColors = {};
+      this.allBubbles.forEach(function (bubble) {
+        containedColors[bubble.color] = true;
+      });
+      this.colors.forEach(function (color) {
+        if (!containedColors[color]) {
+          _this4.colors.splice(_this4.colors.indexOf(color), 1);
+        }
+      });
+    } // adjustColorOptions(bubble) {
+    //   if (this.allBubbles.some((unit) => unit.color === bubble.color) === false) {
+    //     this.colors.splice(this.colors.indexOf(bubble.color), 1);
+    //   }
+    // }
+
+  }, {
+    key: "traceToCenter",
+    value: function traceToCenter(bubble) {
+      var beenChecked = [bubble];
+      var toCheck = [bubble];
+      var elim = true;
+      debugger;
+
+      while (toCheck.length > 0) {
+        if (toCheck[0].color === 'silver') {
+          toCheck = [];
+          elim = false;
+          return;
+        } else {
+          toCheck[0].touching.forEach(function (next) {
+            if (next.color === 'silver') {
+              toCheck = [];
+              elim = false;
+              return;
+            } else if (beenChecked.indexOf(next) === -1) {
+              toCheck.push(next);
+              beenChecked.push(next);
+            }
+          });
+        }
+
+        toCheck.shift();
+      }
+
+      if (elim) {
+        this.eliminateEntireTree(bubble);
+      }
+    }
+  }, {
+    key: "destroyBubble",
+    value: function destroyBubble(bubble) {
+      bubble.touching.forEach(function (bub) {
+        bub.touching.splice(bub.touching.indexOf(bubble), 1);
+      });
+      this.allBubbles.splice(this.allBubbles.indexOf(bubble), 1);
+    }
+  }, {
+    key: "eliminateEntireTree",
+    value: function eliminateEntireTree(bubble) {
+      var _this5 = this;
+
+      var choppingBlock = [bubble];
+      var queue = bubble.touching.slice();
+
+      while (queue.length > 0) {
+        queue[0].touching.forEach(function (item) {
+          if (queue.indexOf(item) === -1 && choppingBlock.indexOf(item) === -1) {
+            queue.push(item);
+          }
+
+          choppingBlock.push(queue[0]);
+        });
+        queue.shift();
+      }
+
+      choppingBlock.forEach(function (sacrifice) {
+        _this5.destroyBubble(sacrifice);
+
+        _this5.points += 1;
+      });
+    }
+  }, {
+    key: "eliminateIslands",
+    value: function eliminateIslands(arr) {
+      var _this6 = this;
+
+      arr.forEach(function (unit) {
+        _this6.traceToCenter(unit);
+      });
+    }
+  }, {
+    key: "eliminateColorTree",
+    value: function eliminateColorTree(bubble) {
+      var _this7 = this;
 
       var queue = bubble.touching.slice();
       var choppingBlock = [bubble];
+      var islandTesters = [];
       var beenQueued = bubble.touching.slice().concat([bubble]);
 
       while (queue.length > 0) {
-        debugger;
-
         if (queue[0].color === bubble.color) {
           choppingBlock.push(queue[0]);
           queue[0].touching.forEach(function (item) {
             if (beenQueued.indexOf(item) === -1 && item.color === bubble.color) {
               queue.push(item);
               beenQueued.push(item);
+            } else if (islandTesters.indexOf(item) === -1 && item.color !== bubble.color) {
+              islandTesters.push(item);
             }
           });
+        } else if (islandTesters.indexOf(queue[0]) === -1) {
+          islandTesters.push(queue[0]);
         }
 
         queue.shift();
       }
 
       choppingBlock.forEach(function (bubble) {
-        _this4.allBubbles.splice(_this4.allBubbles.indexOf(bubble), 1);
+        _this7.points += 1;
+
+        _this7.destroyBubble(bubble);
       });
+      this.eliminateIslands(islandTesters);
+      this.adjustColorOptions();
     }
   }, {
     key: "evaluateCollision",
     value: function evaluateCollision(newBubble) {
-      var _this5 = this;
+      var _this8 = this;
 
       var addNew = true;
       console.log(this.allBubbles);
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this5.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
-          if (_this5.isTouchingOwnColor(oldBubble)) {
-            _this5.eliminateTree(oldBubble);
+        if (_this8.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
+          if (_this8.isTouchingOwnColor(oldBubble)) {
+            _this8.eliminateColorTree(oldBubble);
 
             addNew = false;
           } else {
             newBubble.touching.push(oldBubble);
             oldBubble.touching.push(newBubble);
           }
-        } else if (_this5.inContact(oldBubble, newBubble)) {
+        } else if (_this8.inContact(oldBubble, newBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble); // if (oldBubble.count >= 1) {
           //   debugger
@@ -413,7 +508,7 @@ function () {
   }, {
     key: "fireBubble",
     value: function fireBubble(e) {
-      var _this6 = this;
+      var _this9 = this;
 
       if (this.readyBubble) {
         this.activeBubble = this.readyBubble;
@@ -427,16 +522,16 @@ function () {
         console.log('fire!');
         this.interval = setInterval(this.dibujar.bind(this), 5);
         this.canvas.removeEventListener('click', function () {
-          return _this6.fireBubble(event);
+          return _this9.fireBubble(event);
         });
       }
     }
   }]);
 
-  return Game;
+  return Round;
 }();
 
-module.exports = Game;
+module.exports = Round;
 
 /***/ })
 
