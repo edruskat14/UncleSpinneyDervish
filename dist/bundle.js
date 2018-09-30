@@ -147,19 +147,15 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
-var bubbleRad = 12;
-var round = new Round(canvas, ctx, 1);
+canvas.addEventListener('click', function () {
+  return round.fireBubble(event);
+}, false);
+var multiplier = 1;
+var round = new Round(canvas, ctx, multiplier);
 round.populateBubbles();
 round.renderAllBubbles();
-
-function oneTurn() {
-  round.newReady();
-  canvas.addEventListener('click', function () {
-    return round.fireBubble(event);
-  }, false);
-}
-
-oneTurn(); // function dibujar() {
+round.renderScore();
+round.newReady(); // function dibujar() {
 //         ctx.clearRect(0, 0, canvas.width, canvas.height);
 //         renderAllBubbles(allBubbles);
 //         movingBubble();
@@ -209,6 +205,14 @@ function () {
   }
 
   _createClass(Round, [{
+    key: "roundOver",
+    value: function roundOver() {
+      return !this.colors[0];
+    }
+  }, {
+    key: "gameOver",
+    value: function gameOver() {}
+  }, {
     key: "inContact",
     value: function inContact(bubA, bubB) {
       var xDist = bubA.x - bubB.x;
@@ -250,21 +254,36 @@ function () {
       this.allBubbles[45].color = 'silver';
     }
   }, {
+    key: "drawBubble",
+    value: function drawBubble(bubble) {
+      this.ctx.beginPath();
+      this.ctx.arc(bubble.x, bubble.y, this.bubbleRad, 0, Math.PI * 2, false);
+      this.ctx.fillStyle = "".concat(bubble.color);
+      this.ctx.fill();
+      this.ctx.closePath();
+    }
+  }, {
     key: "renderAllBubbles",
     value: function renderAllBubbles() {
       var _this2 = this;
 
       this.allBubbles.forEach(function (bubble) {
-        _this2.ctx.beginPath();
-
-        _this2.ctx.arc(bubble.x, bubble.y, _this2.bubbleRad, 0, Math.PI * 2, false);
-
-        _this2.ctx.fillStyle = "".concat(bubble.color);
-
-        _this2.ctx.fill();
-
-        _this2.ctx.closePath();
+        _this2.drawBubble(bubble);
       });
+    }
+  }, {
+    key: "reRender",
+    value: function reRender() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.renderAllBubbles();
+      this.renderScore();
+    }
+  }, {
+    key: "renderScore",
+    value: function renderScore() {
+      this.ctx.font = '19px serif';
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillText("Score: ".concat(this.points), 25, 14);
     }
   }, {
     key: "newReady",
@@ -275,11 +294,7 @@ function () {
   }, {
     key: "movingBubble",
     value: function movingBubble(bubble) {
-      this.ctx.beginPath();
-      this.ctx.arc(bubble.x, bubble.y, this.bubbleRad, 0, Math.PI * 2, false);
-      this.ctx.fillStyle = "".concat(bubble.color);
-      this.ctx.fill();
-      this.ctx.closePath();
+      this.drawBubble(bubble);
 
       if (bubble.y + bubble.dy > this.canvas.height - this.bubbleRad || bubble.y + bubble.dy < this.bubbleRad) {
         bubble.dy = -bubble.dy;
@@ -340,7 +355,6 @@ function () {
       var beenChecked = [bubble];
       var toCheck = [bubble];
       var elim = true;
-      debugger;
 
       while (toCheck.length > 0) {
         if (toCheck[0].color === 'silver') {
@@ -397,7 +411,7 @@ function () {
       choppingBlock.forEach(function (sacrifice) {
         _this5.destroyBubble(sacrifice);
 
-        _this5.points += 1;
+        _this5.points += 1 * _this5.multiplier;
       });
     }
   }, {
@@ -438,10 +452,11 @@ function () {
       }
 
       choppingBlock.forEach(function (bubble) {
-        _this7.points += 1;
+        _this7.points += 1 * _this7.multiplier;
 
         _this7.destroyBubble(bubble);
       });
+      this.points += 1;
       this.eliminateIslands(islandTesters);
       this.adjustColorOptions();
     }
@@ -464,20 +479,7 @@ function () {
           }
         } else if (_this8.inContact(oldBubble, newBubble)) {
           newBubble.touching.push(oldBubble);
-          oldBubble.touching.push(newBubble); // if (oldBubble.count >= 1) {
-          //   debugger
-          //   toDelete = oldBubble.touching.concat([oldBubble]);
-          //   toDelete.forEach((deleteBubble) => {
-          //     this.allBubbles.splice(this.allBubbles.indexOf(deleteBubble), 1);
-          //     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          //     this.renderAllBubbles();
-          //   })
-          //   return;
-          // } else {
-          //   newBubble.touching = oldBubble.touching;
-          //   newBubble.touching.push(oldBubble);
-          //   this.allBubbles.push(newBubble);
-          // }
+          oldBubble.touching.push(newBubble);
         }
       });
 
@@ -485,8 +487,7 @@ function () {
         this.allBubbles.push(newBubble);
       }
 
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.renderAllBubbles();
+      this.reRender();
       this.newReady();
     }
   }, {
@@ -501,15 +502,12 @@ function () {
   }, {
     key: "dibujar",
     value: function dibujar() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.renderAllBubbles();
+      this.reRender();
       this.movingBubble(this.activeBubble);
     }
   }, {
     key: "fireBubble",
     value: function fireBubble(e) {
-      var _this9 = this;
-
       if (this.readyBubble) {
         this.activeBubble = this.readyBubble;
         this.readyBubble = null;
@@ -517,13 +515,10 @@ function () {
         w = mousePos.x - this.canvas.width / 2;
         h = mousePos.y;
         denominator = Math.sqrt(w * w + h * h);
-        this.activeBubble.dx = 2 * (w / denominator);
-        this.activeBubble.dy = 2 * (h / denominator);
+        this.activeBubble.dx = 4 * (w / denominator);
+        this.activeBubble.dy = 4 * (h / denominator);
         console.log('fire!');
         this.interval = setInterval(this.dibujar.bind(this), 5);
-        this.canvas.removeEventListener('click', function () {
-          return _this9.fireBubble(event);
-        });
       }
     }
   }]);
