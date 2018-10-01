@@ -390,7 +390,6 @@ function () {
     value: function adjustColorOptions() {
       var _this5 = this;
 
-      debugger;
       containedColors = {};
       this.allBubbles.forEach(function (bubble) {
         containedColors[bubble.color] = true;
@@ -406,36 +405,7 @@ function () {
       console.log(this.allBubbles);
       console.log(this.colors);
       console.log('-------');
-    } // traceToCenter(bubble) {
-    //   const beenChecked = [bubble];
-    //   let toCheck = [bubble];
-    //   let elim = true;
-    //   while (toCheck.length > 0) {
-    //     if (toCheck[0].color === 'silver') {
-    //       toCheck = [];
-    //       elim = false;
-    //       return;
-    //     } else {
-    //       let touch = toCheck[0].touching
-    //       for(let i = 0; i < touch.length - 1; i++){
-    //         if (touch[i].color === 'silver') {
-    //           debugger
-    //           toCheck = [];
-    //           elim = false;
-    //           return;
-    //         } else if (beenChecked.indexOf(touch[i]) === -1) {
-    //           toCheck.push(touch[i]);
-    //           beenChecked.push(touch[i]);
-    //         }
-    //       }
-    //     }
-    //     toCheck.shift();
-    //   }
-    //   if (elim) {
-    //     this.eliminateEntireTree(bubble);
-    //   }
-    // }
-
+    }
   }, {
     key: "traceToCenter",
     value: function traceToCenter(bubble) {
@@ -449,25 +419,55 @@ function () {
           elim = false;
           return;
         } else {
-          toCheck[0].touching.forEach(function (next) {
-            if (next.color === 'silver') {
+          var touch = toCheck[0].touching;
+
+          for (var i = 0; i < touch.length; i++) {
+            if (touch[i].color === 'silver') {
               toCheck = [];
               elim = false;
               return;
-            } else if (beenChecked.indexOf(next) === -1) {
-              toCheck.push(next);
-              beenChecked.push(next);
+            } else if (beenChecked.indexOf(touch[i]) === -1) {
+              toCheck.push(touch[i]);
+              beenChecked.push(touch[i]);
             }
-          });
+          }
         }
 
         toCheck.shift();
       }
 
       if (elim) {
+        debugger;
         this.eliminateEntireTree(bubble);
       }
-    }
+    } // traceToCenter(bubble) {
+    //   const beenChecked = [bubble];
+    //   let toCheck = [bubble];
+    //   let elim = true;
+    //   while (toCheck.length > 0) {
+    //     if (toCheck[0].color === 'silver') {
+    //       toCheck = [];
+    //       elim = false;
+    //       return;
+    //     } else {
+    //       toCheck[0].touching.forEach((next) => {
+    //         if (next.color === 'silver') {
+    //           toCheck = [];
+    //           elim = false;
+    //           return;
+    //         } else if (beenChecked.indexOf(next) === -1) {
+    //           toCheck.push(next);
+    //           beenChecked.push(next);
+    //         }
+    //       })
+    //     }
+    //     toCheck.shift();
+    //   }
+    //   if (elim) {
+    //     this.eliminateEntireTree(bubble);
+    //   }
+    // }
+
   }, {
     key: "destroyBubble",
     value: function destroyBubble(bubble) {
