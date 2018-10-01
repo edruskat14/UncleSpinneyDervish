@@ -208,7 +208,7 @@ function () {
   _createClass(Game, [{
     key: "roundOver",
     value: function roundOver() {
-      return !this.colors[0];
+      return this.allBubbles.length <= 1;
     }
   }, {
     key: "resetColors",
@@ -218,9 +218,10 @@ function () {
   }, {
     key: "newRound",
     value: function newRound() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.multiplier += 1;
-      this.populateBubbles();
       this.resetColors();
+      this.populateBubbles();
       this.renderAllBubbles();
       this.renderScore();
       this.renderLine();
@@ -396,9 +397,33 @@ function () {
           _this5.colors.splice(_this5.colors.indexOf(color), 1);
         }
       });
-    } // adjustColorOptions(bubble) {
-    //   if (this.allBubbles.some((unit) => unit.color === bubble.color) === false) {
-    //     this.colors.splice(this.colors.indexOf(bubble.color), 1);
+    } // traceToCenter(bubble) {
+    //   const beenChecked = [bubble];
+    //   let toCheck = [bubble];
+    //   let elim = true;
+    //   while (toCheck.length > 0) {
+    //     if (toCheck[0].color === 'silver') {
+    //       toCheck = [];
+    //       elim = false;
+    //       return;
+    //     } else {
+    //       let touch = toCheck[0].touching
+    //       for(let i = 0; i < touch.length - 1; i++){
+    //         if (touch[i].color === 'silver') {
+    //           debugger
+    //           toCheck = [];
+    //           elim = false;
+    //           return;
+    //         } else if (beenChecked.indexOf(touch[i]) === -1) {
+    //           toCheck.push(touch[i]);
+    //           beenChecked.push(touch[i]);
+    //         }
+    //       }
+    //     }
+    //     toCheck.shift();
+    //   }
+    //   if (elim) {
+    //     this.eliminateEntireTree(bubble);
     //   }
     // }
 
@@ -451,13 +476,13 @@ function () {
       var queue = bubble.touching.slice();
 
       while (queue.length > 0) {
+        debugger;
         queue[0].touching.forEach(function (item) {
           if (queue.indexOf(item) === -1 && choppingBlock.indexOf(item) === -1) {
             queue.push(item);
           }
-
-          choppingBlock.push(queue[0]);
         });
+        choppingBlock.push(queue[0]);
         queue.shift();
       }
 
@@ -511,7 +536,7 @@ function () {
 
         _this8.destroyBubble(bubble);
       });
-      this.points += 1;
+      this.points += 1 * this.multiplier;
       this.eliminateIslands(islandTesters);
       this.adjustColorOptions();
     }
@@ -545,7 +570,7 @@ function () {
       if (this.gameOver()) {
         this.endTheGame();
       } else if (this.roundOver()) {
-        this.newRoundEval();
+        this.newRound();
       } else {
         this.reRender();
         this.newReady();
