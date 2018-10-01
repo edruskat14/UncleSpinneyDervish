@@ -220,6 +220,7 @@ function () {
     value: function newRound() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.multiplier += 1;
+      this.allBubbles = [];
       this.resetColors();
       this.populateBubbles();
       this.renderAllBubbles();
@@ -338,6 +339,7 @@ function () {
       this.ctx.font = '19px serif';
       this.ctx.fillStyle = 'black';
       this.ctx.fillText("Score: ".concat(this.points), 25, 18);
+      this.ctx.fillText("Round: ".concat(this.multiplier), 425, 18);
     }
   }, {
     key: "newReady",
@@ -388,15 +390,22 @@ function () {
     value: function adjustColorOptions() {
       var _this5 = this;
 
+      debugger;
       containedColors = {};
       this.allBubbles.forEach(function (bubble) {
         containedColors[bubble.color] = true;
       });
-      this.colors.forEach(function (color) {
+      var sampleColors = this.colors.slice();
+      sampleColors.forEach(function (color) {
         if (!containedColors[color]) {
           _this5.colors.splice(_this5.colors.indexOf(color), 1);
+
+          console.log(_this5.colors);
         }
       });
+      console.log(this.allBubbles);
+      console.log(this.colors);
+      console.log('-------');
     } // traceToCenter(bubble) {
     //   const beenChecked = [bubble];
     //   let toCheck = [bubble];
@@ -476,7 +485,6 @@ function () {
       var queue = bubble.touching.slice();
 
       while (queue.length > 0) {
-        debugger;
         queue[0].touching.forEach(function (item) {
           if (queue.indexOf(item) === -1 && choppingBlock.indexOf(item) === -1) {
             queue.push(item);
@@ -546,7 +554,6 @@ function () {
       var _this9 = this;
 
       var addNew = true;
-      console.log(this.allBubbles);
       this.allBubbles.forEach(function (oldBubble) {
         if (_this9.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
           if (_this9.isTouchingOwnColor(oldBubble)) {
@@ -603,6 +610,7 @@ function () {
         denominator = Math.sqrt(w * w + h * h);
         this.activeBubble.dx = 4 * (w / denominator);
         this.activeBubble.dy = 4 * (h / denominator);
+        this.testNum += 1;
         console.log('fire!');
         this.interval = setInterval(this.dibujar.bind(this), 5);
       }
