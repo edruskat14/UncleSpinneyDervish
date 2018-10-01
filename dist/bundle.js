@@ -141,21 +141,21 @@ module.exports = Bubble;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Round = __webpack_require__(/*! ./round */ "./lib/round.js");
+var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
 canvas.addEventListener('click', function () {
-  return round.fireBubble(event);
+  return game.fireBubble(event);
 }, false);
-var multiplier = 1;
-var round = new Round(canvas, ctx, multiplier);
-round.populateBubbles();
-round.renderAllBubbles();
-round.renderScore();
-round.newReady(); // function dibujar() {
+var game = new Game(canvas, ctx);
+game.populateBubbles();
+game.renderAllBubbles();
+game.renderScore();
+game.newReady(); // game.renderGameOver();
+// function dibujar() {
 //         ctx.clearRect(0, 0, canvas.width, canvas.height);
 //         renderAllBubbles(allBubbles);
 //         movingBubble();
@@ -170,10 +170,10 @@ round.newReady(); // function dibujar() {
 
 /***/ }),
 
-/***/ "./lib/round.js":
-/*!**********************!*\
-  !*** ./lib/round.js ***!
-  \**********************/
+/***/ "./lib/game.js":
+/*!*********************!*\
+  !*** ./lib/game.js ***!
+  \*********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -185,15 +185,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
 
-var Round =
+var Game =
 /*#__PURE__*/
 function () {
-  function Round(canvas, ctx, multiplier) {
-    _classCallCheck(this, Round);
+  function Game(canvas, ctx) {
+    _classCallCheck(this, Game);
 
     this.canvas = canvas;
     this.ctx = ctx;
-    this.multiplier = multiplier;
+    this.multiplier = 1;
     this.points = 0;
     this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
     this.allBubbles = [];
@@ -204,14 +204,55 @@ function () {
     this.interval = null;
   }
 
-  _createClass(Round, [{
+  _createClass(Game, [{
     key: "roundOver",
     value: function roundOver() {
       return !this.colors[0];
     }
   }, {
+    key: "resetColors",
+    value: function resetColors() {
+      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+    }
+  }, {
+    key: "newRound",
+    value: function newRound() {
+      this.multiplier += 1;
+      this.populateBubbles();
+      this.resetColors();
+      this.renderAllBubbles();
+      this.renderScore();
+      this.newReady();
+    }
+  }, {
+    key: "touchingEdge",
+    value: function touchingEdge(bubble) {
+      if (bubble.x >= this.canvas.width - this.bubbleRad || bubble.x <= this.bubbleRad) {
+        return true;
+      } else if (bubble.y >= this.canvas.height - this.bubbleRad || bubble.y <= 50 + this.bubbleRad) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }, {
     key: "gameOver",
-    value: function gameOver() {}
+    value: function gameOver() {
+      var _this = this;
+
+      return this.allBubbles.some(function (bub) {
+        return _this.touchingEdge(bub);
+      });
+    }
+  }, {
+    key: "endTheGame",
+    value: function endTheGame() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.renderScore();
+      this.ctx.font = '41px serif';
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillText("game over", 205, 141);
+    }
   }, {
     key: "inContact",
     value: function inContact(bubA, bubB) {
@@ -223,10 +264,10 @@ function () {
   }, {
     key: "initialEvaluation",
     value: function initialEvaluation(newBubble) {
-      var _this = this;
+      var _this2 = this;
 
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this.inContact(newBubble, oldBubble)) {
+        if (_this2.inContact(newBubble, oldBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble);
         }
@@ -265,10 +306,10 @@ function () {
   }, {
     key: "renderAllBubbles",
     value: function renderAllBubbles() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.allBubbles.forEach(function (bubble) {
-        _this2.drawBubble(bubble);
+        _this3.drawBubble(bubble);
       });
     }
   }, {
@@ -316,10 +357,10 @@ function () {
   }, {
     key: "touchingAnyBubble",
     value: function touchingAnyBubble(bubble) {
-      var _this3 = this;
+      var _this4 = this;
 
       return this.allBubbles.some(function (bub) {
-        return _this3.inContact(bubble, bub);
+        return _this4.inContact(bubble, bub);
       });
     }
   }, {
@@ -332,7 +373,7 @@ function () {
   }, {
     key: "adjustColorOptions",
     value: function adjustColorOptions() {
-      var _this4 = this;
+      var _this5 = this;
 
       containedColors = {};
       this.allBubbles.forEach(function (bubble) {
@@ -340,7 +381,7 @@ function () {
       });
       this.colors.forEach(function (color) {
         if (!containedColors[color]) {
-          _this4.colors.splice(_this4.colors.indexOf(color), 1);
+          _this5.colors.splice(_this5.colors.indexOf(color), 1);
         }
       });
     } // adjustColorOptions(bubble) {
@@ -392,7 +433,7 @@ function () {
   }, {
     key: "eliminateEntireTree",
     value: function eliminateEntireTree(bubble) {
-      var _this5 = this;
+      var _this6 = this;
 
       var choppingBlock = [bubble];
       var queue = bubble.touching.slice();
@@ -409,24 +450,26 @@ function () {
       }
 
       choppingBlock.forEach(function (sacrifice) {
-        _this5.destroyBubble(sacrifice);
+        _this6.destroyBubble(sacrifice);
 
-        _this5.points += 1 * _this5.multiplier;
+        _this6.points += 1 * _this6.multiplier;
       });
     }
   }, {
     key: "eliminateIslands",
     value: function eliminateIslands(arr) {
-      var _this6 = this;
+      var _this7 = this;
 
       arr.forEach(function (unit) {
-        _this6.traceToCenter(unit);
+        if (_this7.allBubbles.indexOf(unit) >= 0) {
+          _this7.traceToCenter(unit);
+        }
       });
     }
   }, {
     key: "eliminateColorTree",
     value: function eliminateColorTree(bubble) {
-      var _this7 = this;
+      var _this8 = this;
 
       var queue = bubble.touching.slice();
       var choppingBlock = [bubble];
@@ -452,9 +495,9 @@ function () {
       }
 
       choppingBlock.forEach(function (bubble) {
-        _this7.points += 1 * _this7.multiplier;
+        _this8.points += 1 * _this8.multiplier;
 
-        _this7.destroyBubble(bubble);
+        _this8.destroyBubble(bubble);
       });
       this.points += 1;
       this.eliminateIslands(islandTesters);
@@ -463,21 +506,21 @@ function () {
   }, {
     key: "evaluateCollision",
     value: function evaluateCollision(newBubble) {
-      var _this8 = this;
+      var _this9 = this;
 
       var addNew = true;
       console.log(this.allBubbles);
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this8.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
-          if (_this8.isTouchingOwnColor(oldBubble)) {
-            _this8.eliminateColorTree(oldBubble);
+        if (_this9.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
+          if (_this9.isTouchingOwnColor(oldBubble)) {
+            _this9.eliminateColorTree(oldBubble);
 
             addNew = false;
           } else {
             newBubble.touching.push(oldBubble);
             oldBubble.touching.push(newBubble);
           }
-        } else if (_this8.inContact(oldBubble, newBubble)) {
+        } else if (_this9.inContact(oldBubble, newBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble);
         }
@@ -487,8 +530,14 @@ function () {
         this.allBubbles.push(newBubble);
       }
 
-      this.reRender();
-      this.newReady();
+      if (this.gameOver()) {
+        this.endTheGame();
+      } else if (this.roundOver()) {
+        this.newRoundEval();
+      } else {
+        this.reRender();
+        this.newReady();
+      }
     }
   }, {
     key: "mousePosition",
@@ -523,10 +572,10 @@ function () {
     }
   }]);
 
-  return Round;
+  return Game;
 }();
 
-module.exports = Round;
+module.exports = Game;
 
 /***/ })
 
