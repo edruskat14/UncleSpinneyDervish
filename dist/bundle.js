@@ -154,6 +154,7 @@ var game = new Game(canvas, ctx);
 game.populateBubbles();
 game.renderAllBubbles();
 game.renderScore();
+game.renderLine();
 game.newReady(); // game.renderGameOver();
 // function dibujar() {
 //         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -222,6 +223,7 @@ function () {
       this.resetColors();
       this.renderAllBubbles();
       this.renderScore();
+      this.renderLine();
       this.newReady();
     }
   }, {
@@ -248,10 +250,11 @@ function () {
     key: "endTheGame",
     value: function endTheGame() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.renderScore();
+      this.renderLine();
       this.ctx.font = '41px serif';
       this.ctx.fillStyle = 'black';
-      this.ctx.fillText("game over", 205, 141);
+      this.ctx.fillText("game over", 170, 141);
+      this.ctx.fillText("final score: ".concat(this.points), 150, 200);
     }
   }, {
     key: "inContact",
@@ -318,13 +321,22 @@ function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllBubbles();
       this.renderScore();
+      this.renderLine();
+    }
+  }, {
+    key: "renderLine",
+    value: function renderLine() {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, 50);
+      this.ctx.lineTo(this.canvas.width, 50);
+      this.ctx.stroke();
     }
   }, {
     key: "renderScore",
     value: function renderScore() {
       this.ctx.font = '19px serif';
       this.ctx.fillStyle = 'black';
-      this.ctx.fillText("Score: ".concat(this.points), 25, 14);
+      this.ctx.fillText("Score: ".concat(this.points), 25, 18);
     }
   }, {
     key: "newReady",
