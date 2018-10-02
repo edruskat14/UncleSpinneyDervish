@@ -186,6 +186,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
 
+var Spinney = __webpack_require__(/*! ./spinney */ "./lib/spinney.js");
+
 var Game =
 /*#__PURE__*/
 function () {
@@ -284,7 +286,7 @@ function () {
       var vert = 190;
 
       for (var i = -5; i < 6; i++) {
-        var hori = 187 - 12.5 * (4 - Math.abs(i));
+        var hori = 188 - 12.5 * (4 - Math.abs(i));
         var lel = 11 - Math.abs(i);
 
         for (var j = lel; j > 0; j--) {
@@ -350,6 +352,8 @@ function () {
   }, {
     key: "movingBubble",
     value: function movingBubble(bubble) {
+      var _this4 = this;
+
       this.drawBubble(bubble);
 
       if (bubble.y + bubble.dy > this.canvas.height - this.bubbleRad || bubble.y + bubble.dy < this.bubbleRad) {
@@ -364,18 +368,28 @@ function () {
         clearInterval(this.interval);
         this.interval = null;
         this.evaluateCollision(bubble);
+        var spinney = new Spinney(this.canvas, this.ctx, bubble.dx, bubble.dy, this.allBubbles);
+        this.interval = setInterval(function () {
+          return _this4.setRender(spinney);
+        }, 10);
       } else {
         bubble.x += bubble.dx;
         bubble.y += bubble.dy;
       }
     }
   }, {
+    key: "setRender",
+    value: function setRender(obj) {
+      obj.iterateSpin();
+      this.renderAllBubbles();
+    }
+  }, {
     key: "touchingAnyBubble",
     value: function touchingAnyBubble(bubble) {
-      var _this4 = this;
+      var _this5 = this;
 
       return this.allBubbles.some(function (bub) {
-        return _this4.inContact(bubble, bub);
+        return _this5.inContact(bubble, bub);
       });
     }
   }, {
@@ -388,7 +402,7 @@ function () {
   }, {
     key: "adjustColorOptions",
     value: function adjustColorOptions() {
-      var _this5 = this;
+      var _this6 = this;
 
       containedColors = {};
       this.allBubbles.forEach(function (bubble) {
@@ -397,14 +411,9 @@ function () {
       var sampleColors = this.colors.slice();
       sampleColors.forEach(function (color) {
         if (!containedColors[color]) {
-          _this5.colors.splice(_this5.colors.indexOf(color), 1);
-
-          console.log(_this5.colors);
+          _this6.colors.splice(_this6.colors.indexOf(color), 1);
         }
       });
-      console.log(this.allBubbles);
-      console.log(this.colors);
-      console.log('-------');
     }
   }, {
     key: "traceToCenter",
@@ -437,7 +446,6 @@ function () {
       }
 
       if (elim) {
-        debugger;
         this.eliminateEntireTree(bubble);
       }
     } // traceToCenter(bubble) {
@@ -479,7 +487,7 @@ function () {
   }, {
     key: "eliminateEntireTree",
     value: function eliminateEntireTree(bubble) {
-      var _this6 = this;
+      var _this7 = this;
 
       var choppingBlock = [bubble];
       var queue = bubble.touching.slice();
@@ -495,26 +503,26 @@ function () {
       }
 
       choppingBlock.forEach(function (sacrifice) {
-        _this6.destroyBubble(sacrifice);
+        _this7.destroyBubble(sacrifice);
 
-        _this6.points += 1 * _this6.multiplier;
+        _this7.points += 1 * _this7.multiplier;
       });
     }
   }, {
     key: "eliminateIslands",
     value: function eliminateIslands(arr) {
-      var _this7 = this;
+      var _this8 = this;
 
       arr.forEach(function (unit) {
-        if (_this7.allBubbles.indexOf(unit) >= 0) {
-          _this7.traceToCenter(unit);
+        if (_this8.allBubbles.indexOf(unit) >= 0) {
+          _this8.traceToCenter(unit);
         }
       });
     }
   }, {
     key: "eliminateColorTree",
     value: function eliminateColorTree(bubble) {
-      var _this8 = this;
+      var _this9 = this;
 
       var queue = bubble.touching.slice();
       var choppingBlock = [bubble];
@@ -540,9 +548,9 @@ function () {
       }
 
       choppingBlock.forEach(function (bubble) {
-        _this8.points += 1 * _this8.multiplier;
+        _this9.points += 1 * _this9.multiplier;
 
-        _this8.destroyBubble(bubble);
+        _this9.destroyBubble(bubble);
       });
       this.points += 1 * this.multiplier;
       this.eliminateIslands(islandTesters);
@@ -551,20 +559,20 @@ function () {
   }, {
     key: "evaluateCollision",
     value: function evaluateCollision(newBubble) {
-      var _this9 = this;
+      var _this10 = this;
 
       var addNew = true;
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this9.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
-          if (_this9.isTouchingOwnColor(oldBubble)) {
-            _this9.eliminateColorTree(oldBubble);
+        if (_this10.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
+          if (_this10.isTouchingOwnColor(oldBubble)) {
+            _this10.eliminateColorTree(oldBubble);
 
             addNew = false;
           } else {
             newBubble.touching.push(oldBubble);
             oldBubble.touching.push(newBubble);
           }
-        } else if (_this9.inContact(oldBubble, newBubble)) {
+        } else if (_this10.inContact(oldBubble, newBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble);
         }
@@ -621,6 +629,108 @@ function () {
 }();
 
 module.exports = Game;
+
+/***/ }),
+
+/***/ "./lib/spinney.js":
+/*!************************!*\
+  !*** ./lib/spinney.js ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Spinney =
+/*#__PURE__*/
+function () {
+  function Spinney(canvas, ctx, dx, dy, bubblesArray) {
+    _classCallCheck(this, Spinney);
+
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.incDx = dx;
+    this.incDy = dy;
+    this.outDx = null;
+    this.outDy = null;
+    this.centerX = 263;
+    this.centerY = 300;
+    this.bubbles = bubblesArray;
+    this.interval = null;
+    this.c = 0.02; // this.drawBubble = this.drawBubble.bind(this);
+  }
+
+  _createClass(Spinney, [{
+    key: "adjustments",
+    value: function adjustments(bubble) {
+      debugger;
+      var adjX = bubble.x - this.centerX;
+      var adjY = bubble.y - this.centerY;
+      return {
+        x: adjX,
+        y: adjY
+      };
+    }
+  }, {
+    key: "findChange",
+    value: function findChange(bubble) {
+      var justments = this.adjustments(bubble);
+      var r = Math.sqrt(justments.x * justments.x + justments.y * justments.y);
+      var thetaO = this.c + Math.atan(justments.y / justments.x);
+      return {
+        x: Math.cos(thetaO) * r,
+        y: Math.sin(thetaO) * r
+      };
+    } // drawBubble(bubble) {
+    //   this.ctx.beginPath();
+    //   this.ctx.arc(bubble.x, bubble.y, this.bubbleRad, 0, Math.PI*2, false);
+    //   this.ctx.fillStyle = `${bubble.color}`;
+    //   this.ctx.fill();
+    //   this.ctx.closePath();
+    // }
+
+  }, {
+    key: "iterateSpin",
+    value: function iterateSpin() {
+      var _this = this;
+
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.bubbles.forEach(function (bub) {
+        if (bub.color !== 'silver') {
+          var justments = _this.adjustments(bub);
+
+          var delta = _this.findChange(bub);
+
+          if (justments.x >= 0 && justments.y >= 0) {
+            bub.x = _this.centerX + delta.x;
+            bub.y = _this.centerY + delta.y;
+          } else if (justments.x < 0 && justments.y >= 0) {
+            bub.x = _this.centerX - delta.x;
+            bub.y = _this.centerY - delta.y;
+          } else if (justments.x >= 0 && justments.y < 0) {
+            bub.x = _this.centerX + delta.x;
+            bub.y = _this.centerY + delta.y;
+          } else if (justments.x < 0 && justments.y < 0) {
+            bub.x = _this.centerX - delta.x;
+            bub.y = _this.centerY - delta.y;
+          }
+        }
+      });
+    }
+  }]);
+
+  return Spinney;
+}(); // impacted bubble x and y
+// tells where the hit is on the circle
+//
+// active bubble dx and dy tell direction
+
+
+module.exports = Spinney;
 
 /***/ })
 
