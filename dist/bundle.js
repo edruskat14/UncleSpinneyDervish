@@ -206,6 +206,10 @@ function () {
     this.mousePosition = this.mousePosition.bind(this);
     this.interval = null;
     this.spinney = null;
+    this.initialPosition = {
+      x: this.canvas.width / 2,
+      y: 14
+    };
   }
 
   _createClass(Game, [{
@@ -230,6 +234,7 @@ function () {
       this.renderScore();
       this.renderLine();
       this.newReady();
+      this.updateInitialPos(this.readyBubble);
     }
   }, {
     key: "touchingEdge",
@@ -345,6 +350,14 @@ function () {
       this.ctx.fillText("Round: ".concat(this.multiplier), 425, 18);
     }
   }, {
+    key: "updateInitialPos",
+    value: function updateInitialPos(bubble) {
+      this.initialPosition = {
+        x: bubble.x,
+        y: bubble.y
+      };
+    }
+  }, {
     key: "newReady",
     value: function newReady() {
       this.readyBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(this.colors.length * Math.random())]);
@@ -359,10 +372,12 @@ function () {
 
       if (bubble.y + bubble.dy > this.canvas.height - this.bubbleRad || bubble.y + bubble.dy < this.bubbleRad) {
         bubble.dy = -bubble.dy;
+        this.updateInitialPos(this.activeBubble);
       }
 
       if (bubble.x + bubble.dx > this.canvas.width - this.bubbleRad || bubble.x + bubble.dx < this.bubbleRad) {
         bubble.dx = -bubble.dx;
+        this.updateInitialPos(this.activeBubble);
       }
 
       if (this.touchingAnyBubble(bubble)) {
@@ -375,7 +390,7 @@ function () {
           this.newRound();
         } else {
           this.evaluateCollision(bubble);
-          this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.allBubbles);
+          this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.initialPosition, this.allBubbles);
           this.interval = setInterval(function () {
             return _this4.setRender(_this4.spinney);
           }, 10);
@@ -397,11 +412,12 @@ function () {
         this.interval = null;
         this.spinney = null;
         this.endTheGame();
-      } else if (Math.abs(this.spinney.c) < 0.003) {
+      } else if (Math.abs(this.spinney.c) < 0.0008) {
         clearInterval(this.interval);
         this.interval = null;
         this.spinney = null;
         this.newReady();
+        this.updateInitialPos(this.readyBubble);
       }
     }
   }, {
@@ -660,56 +676,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var Spinney =
 /*#__PURE__*/
 function () {
-  function Spinney(canvas, ctx, impactBubble, bubblesArray) {
+  function Spinney(canvas, ctx, impactBubble, initialPos, bubblesArray) {
     _classCallCheck(this, Spinney);
 
     this.canvas = canvas;
     this.ctx = ctx;
     this.incDx = impactBubble.dx;
     this.incDy = impactBubble.dy;
-    this.impactBubble = impactBubble;
-    this.outDx = null;
-    this.outDy = null;
     this.centerX = 263;
     this.centerY = 320;
     this.bubbles = bubblesArray;
-    this.interval = null;
     this.c = null;
-    this.attackAngle();
+    this.initialPos = this.adjustments(initialPos.x, initialPos.y);
+    this.impactBubble = this.adjustments(impactBubble.x, impactBubble.y);
+    this.adjustConstant();
   }
 
   _createClass(Spinney, [{
-    key: "attackAngle",
-    value: function attackAngle() {
-      var justments = this.adjustments(this.impactBubble);
-      var theta = Math.atan(this.incDx / this.incDy);
-      var alpha = Math.atan(justments.y / justments.x);
-      var ang = Math.PI - theta - alpha;
-
-      if (ang < Math.PI / 2 || ang > 2 * Math.PI / 2) {
-        this.c = 0.03 * Math.sin(ang);
-      } else {
-        this.c = 0.03 * -Math.sin(ang);
-      }
-    } // attackAngle(){
-    //   const justments = this.adjustments(this.impactBubble);
-    //   debugger
-    //   const numerator = (this.incDy * this.incDx) + (justments.x * justments.y);
-    //   const denominator = (Math.sqrt((this.incDy * this.incDy) + (this.incDx * this.incDx)) * Math.sqrt((justments.y * justments.y) + (justments.x * justments.x)))
-    //   const imp = Math.acos(Math.abs(numerator / denominator));
-    //   const ang = Math.sin(imp);
-    //   if (ang < Math.PI / 2 || ang > 2 * Math.PI / 2) {
-    //     this.c = 0.1* Math.sin(ang);
-    //   } else {
-    //     this.c = 0.1* -Math.sin(ang);
-    //   }
-    // }
-
-  }, {
     key: "adjustments",
-    value: function adjustments(bubble) {
-      var adjX = bubble.x - this.centerX;
-      var adjY = bubble.y - this.centerY;
+    value: function adjustments(x, y) {
+      var adjX = x - this.centerX;
+      var adjY = y - this.centerY;
       return {
         x: adjX,
         y: adjY
@@ -718,7 +705,7 @@ function () {
   }, {
     key: "findChange",
     value: function findChange(bubble) {
-      var justments = this.adjustments(bubble);
+      var justments = this.adjustments(bubble.x, bubble.y);
       var r = Math.sqrt(justments.x * justments.x + justments.y * justments.y);
       var thetaO = this.c + Math.atan(justments.y / justments.x);
       return {
@@ -727,21 +714,35 @@ function () {
       };
     }
   }, {
+    key: "radToDeg",
+    value: function radToDeg(ang) {
+      return ang * 180 / Math.PI;
+    }
+  }, {
     key: "findImpactAngle",
-    value: function findImpactAngle(bubble) {
-      var justments = this.adjustments(bubble);
-      var u1 = bubble.x * this.incDx;
-      var u2 = bubble.y * this.incDy;
-      var denominator = Math.sqrt(justments.x * justments.x + justments.y * justments.y) * Math.sqrt(this.incDx * this.incDx + this.incDy * this.incDy);
-      var result = (u1 + u2) / denominator;
-    } // drawBubble(bubble) {
-    //   this.ctx.beginPath();
-    //   this.ctx.arc(bubble.x, bubble.y, this.bubbleRad, 0, Math.PI*2, false);
-    //   this.ctx.fillStyle = `${bubble.color}`;
-    //   this.ctx.fill();
-    //   this.ctx.closePath();
-    // }
+    value: function findImpactAngle() {
+      var slopeA = (this.impactBubble.y - this.initialPos.y) / (this.impactBubble.x - this.initialPos.x);
+      var slopeB = this.impactBubble.y / this.impactBubble.x; // this.ctx.beginPath();
+      // this.ctx.moveTo(263, 320);
+      // this.ctx.lineTo(this.impactBubble.x + 263, this.impactBubble.y + 320);
+      // this.ctx.stroke();
+      // this.ctx.beginPath();
+      // this.ctx.moveTo(this.initialPos.x + 263, this.initialPos.y + 320);
+      // this.ctx.lineTo(this.impactBubble.x + 263, this.impactBubble.y + 320);
+      // this.ctx.stroke();
 
+      var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
+      var aaaaa = this.radToDeg(Math.atan(tanAng));
+      console.log(aaaaa);
+      debugger;
+      return Math.atan(tanAng);
+    }
+  }, {
+    key: "adjustConstant",
+    value: function adjustConstant() {
+      var ang = this.findImpactAngle();
+      this.c = 0.1 * Math.sin(ang);
+    }
   }, {
     key: "iterateSpin",
     value: function iterateSpin() {
@@ -750,7 +751,7 @@ function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.bubbles.forEach(function (bub) {
         if (bub.color !== 'silver') {
-          var justments = _this.adjustments(bub);
+          var justments = _this.adjustments(bub.x, bub.y);
 
           var delta = _this.findChange(bub);
 
@@ -769,16 +770,12 @@ function () {
           }
         }
       });
-      this.c *= 0.9930;
+      this.c *= 0.980;
     }
   }]);
 
   return Spinney;
-}(); // impacted bubble x and y
-// tells where the hit is on the circle
-//
-// active bubble dx and dy tell direction
-
+}();
 
 module.exports = Spinney; //
 // class Spinney {
