@@ -1,23 +1,53 @@
 .main-body {
-  align-items: center;
+  /* align-items: center; */
   background-color: #b2e1e6;
 }
-.title {
+/* .title {
   font-size: 18px;
+  font-family: 'Chakra Petch', sans-serif;
   width: 172px;
   margin: 0 auto;
-}
+} */
 .canvas-div {
+  position: relative;
   align-items: center;
+  display: block;
+  margin: 0 auto;
+  width: 527px;
+  /* top: -141px; */
 }
 .canvas {
-  position: relative;
-  display: block;
+  position: absolute;
+  top: 60px;
   border: 1px solid black;
   height: 600px;
   width: 525px;
   border-radius: 5px;
   background-color: rgba(235, 235, 235);
-  margin: 0 auto;
 
+}
+.title {
+  font-family: 'Chakra Petch', sans-serif;
+  z-index: -1;
+  font-size: 80px;
+}
+.one{
+  position: relative;
+  width: 200px;
+  transform: rotate(-41deg);
+  top: 14px;
+  left: -114px;
+}
+.two {
+  position: relative;
+  width: 200px;
+  transform: rotate(41deg);
+  top: -136px;
+  left: 449px;
+}
+.three {
+  position: relative;
+  width: 200px;
+  top: 314px;
+  left: 123px;
 }

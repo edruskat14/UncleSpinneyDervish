@@ -147,10 +147,24 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
+var game = new Game(canvas, ctx);
 canvas.addEventListener('click', function () {
   return game.fireBubble(event);
 }, false);
-var game = new Game(canvas, ctx);
+document.addEventListener('keypress', function () {
+  return checkKey(event);
+}, false);
+
+function checkKey(e) {
+  e.preventDefault();
+
+  if (e.key === " ") {
+    if (game.over) {
+      game.newGame();
+    }
+  }
+}
+
 game.populateBubbles();
 game.renderAllBubbles();
 game.renderScore();
@@ -188,6 +202,8 @@ var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
 
 var Spinney = __webpack_require__(/*! ./spinney */ "./lib/spinney.js");
 
+var GameOver = __webpack_require__(/*! ./game_over */ "./lib/game_over.js");
+
 var Game =
 /*#__PURE__*/
 function () {
@@ -210,17 +226,27 @@ function () {
       x: this.canvas.width / 2,
       y: 14
     };
+    this.over = false;
   }
 
   _createClass(Game, [{
+    key: "resetColors",
+    value: function resetColors() {
+      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+    }
+  }, {
     key: "roundOver",
     value: function roundOver() {
       return this.allBubbles.length <= 1;
     }
   }, {
-    key: "resetColors",
-    value: function resetColors() {
-      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+    key: "gameOver",
+    value: function gameOver() {
+      var _this = this;
+
+      return this.allBubbles.some(function (bub) {
+        return _this.touchingEdge(bub);
+      });
     }
   }, {
     key: "newRound",
@@ -237,34 +263,29 @@ function () {
       this.updateInitialPos(this.readyBubble);
     }
   }, {
-    key: "touchingEdge",
-    value: function touchingEdge(bubble) {
-      if (bubble.x >= this.canvas.width - this.bubbleRad || bubble.x <= this.bubbleRad) {
-        return true;
-      } else if (bubble.y >= this.canvas.height - this.bubbleRad || bubble.y <= 50 + this.bubbleRad) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }, {
-    key: "gameOver",
-    value: function gameOver() {
-      var _this = this;
-
-      return this.allBubbles.some(function (bub) {
-        return _this.touchingEdge(bub);
-      });
-    }
-  }, {
     key: "endTheGame",
     value: function endTheGame() {
+      this.over = true;
+      new GameOver(this, this.canvas, this.ctx);
+    }
+  }, {
+    key: "newGame",
+    value: function newGame() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.multiplier = 1;
+      this.points = 0;
+      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+      this.allBubbles = [];
+      this.readyBubble = null;
+      this.activeBubble = null;
+      this.interval = null;
+      this.spinney = null;
+      this.over = false;
+      this.populateBubbles();
+      this.renderAllBubbles();
+      this.renderScore();
       this.renderLine();
-      this.ctx.font = '41px serif';
-      this.ctx.fillStyle = 'black';
-      this.ctx.fillText("game over", 170, 141);
-      this.ctx.fillText("final score: ".concat(this.points), 150, 200);
+      this.newReady();
     }
   }, {
     key: "inContact",
@@ -362,6 +383,17 @@ function () {
     value: function newReady() {
       this.readyBubble = new Bubble(this.canvas.width / 2, 14, this.colors[Math.floor(this.colors.length * Math.random())]);
       this.readyBubble.render();
+    }
+  }, {
+    key: "touchingEdge",
+    value: function touchingEdge(bubble) {
+      if (bubble.x >= this.canvas.width - this.bubbleRad || bubble.x <= this.bubbleRad) {
+        return true;
+      } else if (bubble.y >= this.canvas.height - this.bubbleRad || bubble.y <= 50 + this.bubbleRad) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }, {
     key: "movingBubble",
@@ -660,6 +692,53 @@ module.exports = Game;
 
 /***/ }),
 
+/***/ "./lib/game_over.js":
+/*!**************************!*\
+  !*** ./lib/game_over.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
+
+var GameOver =
+/*#__PURE__*/
+function () {
+  function GameOver(game, canvas, ctx) {
+    _classCallCheck(this, GameOver);
+
+    this.game = game;
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.renderScreen();
+  }
+
+  _createClass(GameOver, [{
+    key: "renderScreen",
+    value: function renderScreen() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.font = '41px 	Marker Felt';
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillText("game over", 170, 141);
+      this.ctx.fillText("final score: ".concat(this.game.points), 150, 200);
+      this.ctx.font = '20px Papyrus';
+      this.ctx.fillText('Push space to play again', 159, 400);
+    }
+  }]);
+
+  return GameOver;
+}();
+
+module.exports = GameOver;
+
+/***/ }),
+
 /***/ "./lib/spinney.js":
 /*!************************!*\
   !*** ./lib/spinney.js ***!
@@ -734,7 +813,6 @@ function () {
       var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
       var aaaaa = this.radToDeg(Math.atan(tanAng));
       console.log(aaaaa);
-      debugger;
       return Math.atan(tanAng);
     }
   }, {
