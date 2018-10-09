@@ -148,6 +148,9 @@ var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
 var game = new Game(canvas, ctx);
+canvas.addEventListener('mousemove', function () {
+  return game.renderShootAssist(event);
+}, false);
 canvas.addEventListener('click', function () {
   return game.fireBubble(event);
 }, false);
@@ -646,7 +649,6 @@ function () {
           contacted.push(oldBubble);
         }
       });
-      debugger;
       var sameColor = contacted.filter(function (bub) {
         return bub.color === newBubble.color;
       });
@@ -700,6 +702,28 @@ function () {
       };
     }
   }, {
+    key: "renderShootAssist",
+    value: function renderShootAssist(e) {
+      debugger;
+
+      if (this.readyBubble) {
+        mousePos = this.mousePosition(e);
+        denominator = Math.sqrt(mousePos.x * mousePos.x + mousePos.y * mousePos.y);
+
+        var _w = 1 * (mousePos.x / denominator);
+
+        var _h = 1 * (mousePos.y / denominator);
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.reRender();
+        this.readyBubble.render();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.canvas.width / 2, 14);
+        this.ctx.lineTo(_w * mousePos.x, _h * mousePos.y);
+        this.ctx.stroke();
+      }
+    }
+  }, {
     key: "dibujar",
     value: function dibujar() {
       this.reRender();
@@ -719,6 +743,7 @@ function () {
         this.activeBubble.dy = 4 * (h / denominator);
         this.testNum += 1;
         console.log('fire!');
+        clearInterval(this.interval);
         this.interval = setInterval(this.dibujar.bind(this), 1);
       }
     }
