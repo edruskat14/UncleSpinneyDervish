@@ -288,12 +288,20 @@ function () {
       this.newReady();
     }
   }, {
-    key: "inContact",
-    value: function inContact(bubA, bubB) {
+    key: "inContactStopMotion",
+    value: function inContactStopMotion(bubA, bubB) {
       var xDist = bubA.x - bubB.x;
       var yDist = bubA.y - bubB.y;
       var totalDist = Math.sqrt(xDist * xDist + yDist * yDist);
-      return totalDist < 2 * this.bubbleRad + 4;
+      return totalDist < 2 * this.bubbleRad + 2;
+    }
+  }, {
+    key: "inContactPop",
+    value: function inContactPop(bubA, bubB) {
+      var xDist = bubA.x - bubB.x;
+      var yDist = bubA.y - bubB.y;
+      var totalDist = Math.sqrt(xDist * xDist + yDist * yDist);
+      return totalDist < 2 * this.bubbleRad + 6;
     }
   }, {
     key: "initialEvaluation",
@@ -301,7 +309,7 @@ function () {
       var _this2 = this;
 
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this2.inContact(newBubble, oldBubble)) {
+        if (_this2.inContactStopMotion(newBubble, oldBubble)) {
           newBubble.touching.push(oldBubble);
           oldBubble.touching.push(newBubble);
         }
@@ -418,8 +426,6 @@ function () {
 
         if (this.gameOver()) {
           this.endTheGame();
-        } else if (this.roundOver()) {
-          this.newRound();
         } else {
           this.evaluateCollision(bubble);
           this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.initialPosition, this.allBubbles);
@@ -431,6 +437,10 @@ function () {
       } else {
         bubble.x += bubble.dx;
         bubble.y += bubble.dy;
+      }
+
+      if (this.roundOver()) {
+        this.newRound();
       }
     }
   }, {
@@ -458,7 +468,7 @@ function () {
       var _this5 = this;
 
       return this.allBubbles.some(function (bub) {
-        return _this5.inContact(bubble, bub);
+        return _this5.inContactStopMotion(bubble, bub);
       });
     }
   }, {
@@ -630,27 +640,56 @@ function () {
     value: function evaluateCollision(newBubble) {
       var _this10 = this;
 
-      var addNew = true;
+      var contacted = [];
       this.allBubbles.forEach(function (oldBubble) {
-        if (_this10.inContact(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
-          if (_this10.isTouchingOwnColor(oldBubble)) {
-            _this10.eliminateColorTree(oldBubble);
-
-            addNew = false;
-          } else {
-            newBubble.touching.push(oldBubble);
-            oldBubble.touching.push(newBubble);
-          }
-        } else if (_this10.inContact(oldBubble, newBubble)) {
-          newBubble.touching.push(oldBubble);
-          oldBubble.touching.push(newBubble);
+        if (_this10.inContactPop(oldBubble, newBubble)) {
+          contacted.push(oldBubble);
         }
       });
+      debugger;
+      var sameColor = contacted.filter(function (bub) {
+        return bub.color === newBubble.color;
+      });
 
-      if (addNew) {
+      if (sameColor.length > 1) {
+        sameColor.forEach(function (bub) {
+          bub.touching.push(newBubble);
+          newBubble.touching.push(bub);
+        });
+        this.allBubbles.push(newBubble);
+        this.eliminateColorTree(newBubble);
+      } else if (sameColor.length === 1 && this.isTouchingOwnColor(sameColor[0])) {
+        this.eliminateColorTree(sameColor[0]);
+      } else {
+        contacted.forEach(function (bub) {
+          bub.touching.push(newBubble);
+          newBubble.touching.push(bub);
+        });
         this.allBubbles.push(newBubble);
       }
-    }
+    } // evaluateCollision(newBubble) {
+    //   let addNew = true;
+    //   this.allBubbles.forEach((oldBubble) => {
+    //   if (this.inContactPop(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
+    //     if (this.isTouchingOwnColor(oldBubble)) {
+    //       this.eliminateColorTree(oldBubble);
+    //       addNew = false;
+    //     } else if (this.isTouchingOwnColor(newBubble)) {
+    //       this.eliminateColorTree(newBubble);
+    //       this.eliminateColorTree(oldBubble);
+    //     } else {
+    //       newBubble.touching.push(oldBubble);
+    //       oldBubble.touching.push(newBubble);
+    //     }
+    //   } else if (this.inContactPop(oldBubble, newBubble)){
+    //     newBubble.touching.push(oldBubble);
+    //     oldBubble.touching.push(newBubble);
+    //     }
+    //   })
+    //   if(addNew) { this.allBubbles.push(newBubble); }
+    //   console.log(this.allBubbles)
+    // }
+
   }, {
     key: "mousePosition",
     value: function mousePosition(e) {
@@ -680,7 +719,7 @@ function () {
         this.activeBubble.dy = 4 * (h / denominator);
         this.testNum += 1;
         console.log('fire!');
-        this.interval = setInterval(this.dibujar.bind(this), 5);
+        this.interval = setInterval(this.dibujar.bind(this), 1);
       }
     }
   }]);
