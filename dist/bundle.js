@@ -143,48 +143,66 @@ module.exports = Bubble;
 
 var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 
+var opener = true;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
-var game = new Game(canvas, ctx);
-canvas.addEventListener('mousemove', function () {
-  return game.renderShootAssist(event);
-}, false);
-canvas.addEventListener('click', function () {
-  return game.fireBubble(event);
-}, false);
-document.addEventListener('keypress', function () {
-  return checkKey(event);
-}, false);
+ctx.fillStyle = "#3BD8CE";
+ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+ctx.stroke();
+ctx.font = '41px serif';
+ctx.fillStyle = 'black';
+ctx.fillText("Uncle Spinney Dervish", 71, 41);
+ctx.fillStyle = 'white';
+ctx.font = '20px serif';
+ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 + 30);
+ctx.font = '18px serif';
+ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 80, canvas.width / 2 - 20);
+ctx.font = '16px serif';
+ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 110, canvas.width / 2 - 20);
+ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 140, canvas.width / 2 - 20);
+ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 170, canvas.width / 2 - 20);
+ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 200, canvas.width / 2 - 20);
+ctx.fillText("Push any button to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
 
-function checkKey(e) {
+var startUp = function startUp(e) {
   e.preventDefault();
 
-  if (e.key === " ") {
-    if (game.over) {
-      game.newGame();
-    }
-  }
-}
+  if (opener === true) {
+    var checkKey = function checkKey(e) {
+      e.preventDefault();
 
-game.populateBubbles();
-game.renderAllBubbles();
-game.renderScore();
-game.renderLine();
-game.newReady(); // game.renderGameOver();
-// function dibujar() {
-//         ctx.clearRect(0, 0, canvas.width, canvas.height);
-//         renderAllBubbles(allBubbles);
-//         movingBubble();
-//       }
-//       const drawControls = {
-//         drawContinuous: function(){ draw = setInterval(dibujar, 20); console.log(allBubbles.length) },
-//         stopDrawing: function(){ clearInterval(draw); console.log(allBubbles.length)}
-//       }
-//       drawControls.drawContinuous();
-//       if (turnOver) { drawControls.stopDrawing() }
-//       return;
+      if (e.key === " ") {
+        if (game.over) {
+          game.newGame();
+        }
+      }
+    };
+
+    opener = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var game = new Game(canvas, ctx);
+    canvas.addEventListener('mousemove', function () {
+      return game.renderShootAssist(event);
+    }, false);
+    canvas.addEventListener('click', function () {
+      return game.fireBubble(event);
+    }, false);
+    document.addEventListener('keypress', function () {
+      return checkKey(event);
+    }, false);
+    game.populateBubbles();
+    game.renderAllBubbles();
+    game.renderScore();
+    game.renderLine();
+    game.newReady();
+  }
+};
+
+document.addEventListener('keypress', function () {
+  return startUp(event);
+}, false);
 
 /***/ }),
 
@@ -710,16 +728,16 @@ function () {
         mousePos = this.mousePosition(e);
         denominator = Math.sqrt(mousePos.x * mousePos.x + mousePos.y * mousePos.y);
 
-        var _w = 1 * (mousePos.x / denominator);
+        var _w = 10 * (mousePos.x / denominator);
 
-        var _h = 1 * (mousePos.y / denominator);
+        var _h = 10 * (mousePos.y / denominator);
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.reRender();
         this.readyBubble.render();
         this.ctx.beginPath();
         this.ctx.moveTo(this.canvas.width / 2, 14);
-        this.ctx.lineTo(_w * mousePos.x, _h * mousePos.y);
+        this.ctx.lineTo(mousePos.x, mousePos.y);
         this.ctx.stroke();
       }
     }
@@ -865,15 +883,7 @@ function () {
     key: "findImpactAngle",
     value: function findImpactAngle() {
       var slopeA = (this.impactBubble.y - this.initialPos.y) / (this.impactBubble.x - this.initialPos.x);
-      var slopeB = this.impactBubble.y / this.impactBubble.x; // this.ctx.beginPath();
-      // this.ctx.moveTo(263, 320);
-      // this.ctx.lineTo(this.impactBubble.x + 263, this.impactBubble.y + 320);
-      // this.ctx.stroke();
-      // this.ctx.beginPath();
-      // this.ctx.moveTo(this.initialPos.x + 263, this.initialPos.y + 320);
-      // this.ctx.lineTo(this.impactBubble.x + 263, this.impactBubble.y + 320);
-      // this.ctx.stroke();
-
+      var slopeB = this.impactBubble.y / this.impactBubble.x;
       var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
       var aaaaa = this.radToDeg(Math.atan(tanAng));
       console.log(aaaaa);
