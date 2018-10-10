@@ -166,16 +166,16 @@ function () {
     value: function makeNewBubbles() {
       var bubs = [];
 
-      for (var i = 0; i < 4; i++) {
+      for (var i = 0; i < 2; i++) {
         x = 0;
-        y = i * 150;
+        y = (i + 1) * 230;
         color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
         bubs.push(new Bubble(x, y, color));
       }
 
-      for (var _i = 0; _i < 4; _i++) {
+      for (var _i = 0; _i < 2; _i++) {
         x = 525;
-        y = _i * 150;
+        y = (_i + 1) * 230;
         color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
         bubs.push(new Bubble(x, y, color));
       }
@@ -209,8 +209,8 @@ function () {
         var adjX = bub.x - _this.centerX;
         var adjY = bub.y - _this.centerY;
         var denominator = Math.sqrt(adjX * adjX + adjY * adjY);
-        var dx = 2 * (-adjX / denominator);
-        var dy = 2 * (-adjY / denominator);
+        var dx = 1 * (-adjX / denominator);
+        var dy = 1 * (-adjY / denominator);
         bub.x = bub.x + dx;
         bub.y = bub.y + dy;
 
@@ -342,6 +342,8 @@ function () {
     this.mousePosition = this.mousePosition.bind(this);
     this.interval = null;
     this.spinney = null;
+    this.prevX = null;
+    this.prevY = null;
     this.adder = null;
     this.misses = Math.floor(3 + 3 * Math.random());
     this.initialPosition = {
@@ -410,6 +412,7 @@ function () {
       this.activeBubble = null;
       this.interval = null;
       this.spinney = null;
+      this.adder = null;
       this.over = false;
       this.startAnew();
     }
@@ -566,13 +569,18 @@ function () {
             this.resetMisses();
           }
 
-          this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.initialPosition, this.allBubbles);
+          this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.initialPosition, this.allBubbles, {
+            x: this.prevX,
+            y: this.prevY
+          });
           this.interval = setInterval(function () {
-            return _this4.setRender(_this4.spinney);
+            return _this4.setRender();
           }, 10);
           this.reRender();
         }
       } else {
+        this.prevX = bubble.x;
+        this.prevY = bubble.y;
         bubble.x += bubble.dx;
         bubble.y += bubble.dy;
       }
@@ -580,24 +588,19 @@ function () {
       if (this.roundOver()) {
         this.newRound();
       }
-    }
-  }, {
-    key: "handleMisses",
-    value: function handleMisses() {
-      this.interval = setInterval(this.missInterval(), 5);
-      this.resetMisses();
-    }
-  }, {
-    key: "missInterval",
-    value: function missInterval() {
-      this.adder.lifeCycle();
+    } // handleMisses() {
+    //   this.interval = setInterval(this.missInterval(), 5)
+    //   this.resetMisses();
+    // }
+    // missInterval() {
+    //   this.adder.lifeCycle();
+    //   if (this.adder.bubbles.length === 0) {
+    //     clearInterval(this.interval);
+    //     this.interval = null;
+    //     this.adder = null;
+    //   }
+    // }
 
-      if (this.adder.bubbles.length === 0) {
-        clearInterval(this.interval);
-        this.interval = null;
-        this.adder = null;
-      }
-    }
   }, {
     key: "setRender",
     value: function setRender() {
@@ -935,7 +938,7 @@ var openingMessage = function openingMessage(canvas, ctx) {
   ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 140, canvas.width / 2 - 20);
   ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 170, canvas.width / 2 - 20);
   ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 200, canvas.width / 2 - 20);
-  ctx.fillText("Push any button to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
+  ctx.fillText("Press any key to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
 };
 
 module.exports = openingMessage;
@@ -958,7 +961,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var Spinney =
 /*#__PURE__*/
 function () {
-  function Spinney(canvas, ctx, impactBubble, initialPos, bubblesArray) {
+  function Spinney(canvas, ctx, impactBubble, initialPos, bubblesArray, prev) {
     _classCallCheck(this, Spinney);
 
     this.canvas = canvas;
@@ -969,6 +972,7 @@ function () {
     this.centerY = 320;
     this.bubbles = bubblesArray;
     this.c = null;
+    this.prevPos = this.adjustments(prev.x, prev.y);
     this.initialPos = this.adjustments(initialPos.x, initialPos.y);
     this.impactBubble = this.adjustments(impactBubble.x, impactBubble.y);
     this.adjustConstant();
@@ -1001,6 +1005,15 @@ function () {
       return ang * 180 / Math.PI;
     }
   }, {
+    key: "movingAway",
+    value: function movingAway() {
+      var current = this.impactBubble;
+      var prev = this.prevPos;
+      var currentLength = Math.sqrt(current.x * current.x + current.y * current.y);
+      var prevLength = Math.sqrt(prev.x * prev.x + prev.y * prev.y);
+      return prevLength < currentLength;
+    }
+  }, {
     key: "oppositeSign",
     value: function oppositeSign(a, b) {
       if (a < 0 && b > 0) {
@@ -1019,14 +1032,15 @@ function () {
       var slopeB = this.impactBubble.y / this.impactBubble.x;
       var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
       var rlAng = Math.atan(tanAng);
-      var aaaaa = this.radToDeg(Math.atan(tanAng)); // // console.log(aaaaa);
-
-      console.log(tanAng);
+      var angleInDeg = this.radToDeg(Math.atan(tanAng)); // // console.log(aaaaa);
+      // console.log(tanAng);
 
       if (!tanAng) {
         return 0;
-      } else if (this.oppositeSign(slopeA, tanAng)) {
-        return -Math.atan(tanAng);
+      } else if (this.movingAway()) {
+        // } else if (this.oppositeSign(slopeA, tanAng) && !this.oppositeSign(this.impactBubble.x, this.incDx)) {
+        return -Math.atan(tanAng); // } else if (this.oppositeSign(slopeA, tanAng) && !this.oppositeSig n(this.impactBubble.y, this.incDy)) {
+        //   return -Math.atan(tanAng);
       } else {
         return Math.atan(tanAng);
       }
