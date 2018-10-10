@@ -851,7 +851,6 @@ function () {
         this.activeBubble.dx = 4 * (w / denominator);
         this.activeBubble.dy = 4 * (h / denominator);
         this.testNum += 1;
-        console.log('fire!');
         clearInterval(this.interval);
         this.interval = setInterval(this.dibujar.bind(this), 1);
       }
@@ -1032,8 +1031,7 @@ function () {
       var slopeB = this.impactBubble.y / this.impactBubble.x;
       var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
       var rlAng = Math.atan(tanAng);
-      var angleInDeg = this.radToDeg(Math.atan(tanAng)); // // console.log(aaaaa);
-      // console.log(tanAng);
+      var angleInDeg = this.radToDeg(Math.atan(tanAng));
 
       if (!tanAng) {
         return 0;
