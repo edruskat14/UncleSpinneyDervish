@@ -134,6 +134,117 @@ module.exports = Bubble;
 
 /***/ }),
 
+/***/ "./lib/bubble_adder.js":
+/*!*****************************!*\
+  !*** ./lib/bubble_adder.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
+
+var BubbleAdder =
+/*#__PURE__*/
+function () {
+  function BubbleAdder(game) {
+    _classCallCheck(this, BubbleAdder);
+
+    this.game = game;
+    this.centerX = 263;
+    this.centerY = 320;
+    this.bubbles = this.makeNewBubbles();
+  }
+
+  _createClass(BubbleAdder, [{
+    key: "makeNewBubbles",
+    value: function makeNewBubbles() {
+      var bubs = [];
+
+      for (var i = 0; i < 4; i++) {
+        x = 0;
+        y = i * 150;
+        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
+        bubs.push(new Bubble(x, y, color));
+      }
+
+      for (var _i = 0; _i < 4; _i++) {
+        x = 525;
+        y = _i * 150;
+        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
+        bubs.push(new Bubble(x, y, color));
+      }
+
+      for (var _i2 = 0; _i2 < 2; _i2++) {
+        y = 0;
+        x = (_i2 + 1) * 180;
+        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
+        bubs.push(new Bubble(x, y, color));
+      }
+
+      for (var _i3 = 0; _i3 < 2; _i3++) {
+        y = 600;
+        x = (_i3 + 1) * 180;
+        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
+        bubs.push(new Bubble(x, y, color));
+      }
+
+      return bubs;
+    }
+  }, {
+    key: "moveEach",
+    value: function moveEach() {
+      var _this = this;
+
+      if (this.bubbles.length === 0) {
+        this.game.adder = null;
+      }
+
+      this.bubbles.forEach(function (bub) {
+        var adjX = bub.x - _this.centerX;
+        var adjY = bub.y - _this.centerY;
+        var denominator = Math.sqrt(adjX * adjX + adjY * adjY);
+        var dx = 2 * (-adjX / denominator);
+        var dy = 2 * (-adjY / denominator);
+        bub.x = bub.x + dx;
+        bub.y = bub.y + dy;
+
+        _this.game.drawBubble(bub);
+
+        if (_this.game.touchingAnyBubble(bub)) {
+          _this.bubbles.splice(_this.bubbles.indexOf(bub), 1);
+
+          _this.game.allBubbles.forEach(function (bubble) {
+            if (_this.game.inContactPop(bub, bubble)) {
+              bubble.touching.push(bub);
+              bub.touching.push(bubble);
+            }
+          });
+
+          _this.game.allBubbles.push(bub);
+        }
+      });
+    }
+  }, {
+    key: "lifeCycle",
+    value: function lifeCycle() {
+      // this.game.reRender();
+      this.moveEach();
+    }
+  }]);
+
+  return BubbleAdder;
+}();
+
+module.exports = BubbleAdder;
+
+/***/ }),
+
 /***/ "./lib/dervish_main.js":
 /*!*****************************!*\
   !*** ./lib/dervish_main.js ***!
@@ -143,28 +254,14 @@ module.exports = Bubble;
 
 var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 
+var openingMessage = __webpack_require__(/*! ./opening_message */ "./lib/opening_message.js");
+
 var opener = true;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
-ctx.fillStyle = "#3BD8CE";
-ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
-ctx.stroke();
-ctx.font = '41px serif';
-ctx.fillStyle = 'black';
-ctx.fillText("Uncle Spinney Dervish", 71, 41);
-ctx.fillStyle = 'white';
-ctx.font = '20px serif';
-ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 + 30);
-ctx.font = '18px serif';
-ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 80, canvas.width / 2 - 20);
-ctx.font = '16px serif';
-ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 110, canvas.width / 2 - 20);
-ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 140, canvas.width / 2 - 20);
-ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 170, canvas.width / 2 - 20);
-ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 200, canvas.width / 2 - 20);
-ctx.fillText("Push any button to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
+openingMessage(canvas, ctx);
 
 var startUp = function startUp(e) {
   e.preventDefault();
@@ -225,6 +322,8 @@ var Spinney = __webpack_require__(/*! ./spinney */ "./lib/spinney.js");
 
 var GameOver = __webpack_require__(/*! ./game_over */ "./lib/game_over.js");
 
+var BubbleAdder = __webpack_require__(/*! ./bubble_adder */ "./lib/bubble_adder.js");
+
 var Game =
 /*#__PURE__*/
 function () {
@@ -243,6 +342,8 @@ function () {
     this.mousePosition = this.mousePosition.bind(this);
     this.interval = null;
     this.spinney = null;
+    this.adder = null;
+    this.misses = Math.floor(3 + 3 * Math.random());
     this.initialPosition = {
       x: this.canvas.width / 2,
       y: 14
@@ -251,6 +352,11 @@ function () {
   }
 
   _createClass(Game, [{
+    key: "resetMisses",
+    value: function resetMisses() {
+      this.misses = Math.floor(3 + 3 * Math.random());
+    }
+  }, {
     key: "resetColors",
     value: function resetColors() {
       this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
@@ -270,10 +376,9 @@ function () {
       });
     }
   }, {
-    key: "newRound",
-    value: function newRound() {
+    key: "startAnew",
+    value: function startAnew() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.multiplier += 1;
       this.allBubbles = [];
       this.resetColors();
       this.populateBubbles();
@@ -282,31 +387,31 @@ function () {
       this.renderLine();
       this.newReady();
       this.updateInitialPos(this.readyBubble);
+      this.resetMisses();
+    }
+  }, {
+    key: "newRound",
+    value: function newRound() {
+      this.multiplier += 1;
+      this.startAnew();
     }
   }, {
     key: "endTheGame",
     value: function endTheGame() {
       this.over = true;
-      new GameOver(this, this.canvas, this.ctx);
+      new GameOver(this);
     }
   }, {
     key: "newGame",
     value: function newGame() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.multiplier = 1;
       this.points = 0;
-      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
-      this.allBubbles = [];
       this.readyBubble = null;
       this.activeBubble = null;
       this.interval = null;
       this.spinney = null;
       this.over = false;
-      this.populateBubbles();
-      this.renderAllBubbles();
-      this.renderScore();
-      this.renderLine();
-      this.newReady();
+      this.startAnew();
     }
   }, {
     key: "inContactStopMotion",
@@ -356,6 +461,8 @@ function () {
       }
 
       this.allBubbles[45].color = 'silver';
+      var nwA = new BubbleAdder(this);
+      nwA.makeNewBubbles();
     }
   }, {
     key: "drawBubble",
@@ -376,14 +483,6 @@ function () {
       });
     }
   }, {
-    key: "reRender",
-    value: function reRender() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.renderAllBubbles();
-      this.renderScore();
-      this.renderLine();
-    }
-  }, {
     key: "renderLine",
     value: function renderLine() {
       this.ctx.beginPath();
@@ -398,6 +497,14 @@ function () {
       this.ctx.fillStyle = 'black';
       this.ctx.fillText("Score: ".concat(this.points), 25, 18);
       this.ctx.fillText("Round: ".concat(this.multiplier), 425, 18);
+    }
+  }, {
+    key: "reRender",
+    value: function reRender() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.renderAllBubbles();
+      this.renderScore();
+      this.renderLine();
     }
   }, {
     key: "updateInitialPos",
@@ -425,12 +532,8 @@ function () {
       }
     }
   }, {
-    key: "movingBubble",
-    value: function movingBubble(bubble) {
-      var _this4 = this;
-
-      this.drawBubble(bubble);
-
+    key: "handleChangeDirection",
+    value: function handleChangeDirection(bubble) {
       if (bubble.y + bubble.dy > this.canvas.height - this.bubbleRad || bubble.y + bubble.dy < this.bubbleRad) {
         bubble.dy = -bubble.dy;
         this.updateInitialPos(this.activeBubble);
@@ -440,6 +543,16 @@ function () {
         bubble.dx = -bubble.dx;
         this.updateInitialPos(this.activeBubble);
       }
+    }
+  }, {
+    key: "movingBubble",
+    value: function movingBubble(bubble) {
+      var _this4 = this;
+
+      console.log('b4');
+      console.log(this.allBubbles);
+      this.drawBubble(bubble);
+      this.handleChangeDirection(bubble);
 
       if (this.touchingAnyBubble(bubble)) {
         clearInterval(this.interval);
@@ -449,6 +562,12 @@ function () {
           this.endTheGame();
         } else {
           this.evaluateCollision(bubble);
+
+          if (this.misses === 0) {
+            this.adder = new BubbleAdder(this);
+            this.resetMisses();
+          }
+
           this.spinney = new Spinney(this.canvas, this.ctx, bubble, this.initialPosition, this.allBubbles);
           this.interval = setInterval(function () {
             return _this4.setRender(_this4.spinney);
@@ -465,22 +584,45 @@ function () {
       }
     }
   }, {
+    key: "handleMisses",
+    value: function handleMisses() {
+      this.interval = setInterval(this.missInterval(), 5);
+      this.resetMisses();
+    }
+  }, {
+    key: "missInterval",
+    value: function missInterval() {
+      this.adder.lifeCycle();
+
+      if (this.adder.bubbles.length === 0) {
+        clearInterval(this.interval);
+        this.interval = null;
+        this.adder = null;
+      }
+    }
+  }, {
     key: "setRender",
-    value: function setRender(spinney) {
-      spinney.iterateSpin();
+    value: function setRender() {
+      this.spinney.iterateSpin();
       this.reRender();
+
+      if (this.adder) {
+        this.adder.lifeCycle();
+      }
 
       if (this.gameOver()) {
         clearInterval(this.interval);
         this.interval = null;
         this.spinney = null;
         this.endTheGame();
-      } else if (Math.abs(this.spinney.c) < 0.0008) {
+      } else if (Math.abs(this.spinney.c) < 0.0008 && this.adder === null) {
         clearInterval(this.interval);
         this.interval = null;
         this.spinney = null;
         this.newReady();
         this.updateInitialPos(this.readyBubble);
+        console.log('aftr');
+        console.log(this.allBubbles);
       }
     }
   }, {
@@ -548,34 +690,7 @@ function () {
       if (elim) {
         this.eliminateEntireTree(bubble);
       }
-    } // traceToCenter(bubble) {
-    //   const beenChecked = [bubble];
-    //   let toCheck = [bubble];
-    //   let elim = true;
-    //   while (toCheck.length > 0) {
-    //     if (toCheck[0].color === 'silver') {
-    //       toCheck = [];
-    //       elim = false;
-    //       return;
-    //     } else {
-    //       toCheck[0].touching.forEach((next) => {
-    //         if (next.color === 'silver') {
-    //           toCheck = [];
-    //           elim = false;
-    //           return;
-    //         } else if (beenChecked.indexOf(next) === -1) {
-    //           toCheck.push(next);
-    //           beenChecked.push(next);
-    //         }
-    //       })
-    //     }
-    //     toCheck.shift();
-    //   }
-    //   if (elim) {
-    //     this.eliminateEntireTree(bubble);
-    //   }
-    // }
-
+    }
   }, {
     key: "destroyBubble",
     value: function destroyBubble(bubble) {
@@ -686,30 +801,11 @@ function () {
           newBubble.touching.push(bub);
         });
         this.allBubbles.push(newBubble);
+        this.misses -= 1;
       }
-    } // evaluateCollision(newBubble) {
-    //   let addNew = true;
-    //   this.allBubbles.forEach((oldBubble) => {
-    //   if (this.inContactPop(oldBubble, newBubble) && oldBubble.color === newBubble.color) {
-    //     if (this.isTouchingOwnColor(oldBubble)) {
-    //       this.eliminateColorTree(oldBubble);
-    //       addNew = false;
-    //     } else if (this.isTouchingOwnColor(newBubble)) {
-    //       this.eliminateColorTree(newBubble);
-    //       this.eliminateColorTree(oldBubble);
-    //     } else {
-    //       newBubble.touching.push(oldBubble);
-    //       oldBubble.touching.push(newBubble);
-    //     }
-    //   } else if (this.inContactPop(oldBubble, newBubble)){
-    //     newBubble.touching.push(oldBubble);
-    //     oldBubble.touching.push(newBubble);
-    //     }
-    //   })
-    //   if(addNew) { this.allBubbles.push(newBubble); }
-    //   console.log(this.allBubbles)
-    // }
 
+      console.log(this.misses);
+    }
   }, {
     key: "mousePosition",
     value: function mousePosition(e) {
@@ -722,8 +818,6 @@ function () {
   }, {
     key: "renderShootAssist",
     value: function renderShootAssist(e) {
-      debugger;
-
       if (this.readyBubble) {
         mousePos = this.mousePosition(e);
         denominator = Math.sqrt(mousePos.x * mousePos.x + mousePos.y * mousePos.y);
@@ -792,12 +886,12 @@ var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 var GameOver =
 /*#__PURE__*/
 function () {
-  function GameOver(game, canvas, ctx) {
+  function GameOver(game) {
     _classCallCheck(this, GameOver);
 
     this.game = game;
-    this.canvas = canvas;
-    this.ctx = ctx;
+    this.canvas = game.canvas;
+    this.ctx = game.ctx;
     this.renderScreen();
   }
 
@@ -805,7 +899,8 @@ function () {
     key: "renderScreen",
     value: function renderScreen() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.font = '41px 	Marker Felt';
+      this.game.renderAllBubbles();
+      this.ctx.font = '41px s';
       this.ctx.fillStyle = 'black';
       this.ctx.fillText("game over", 170, 141);
       this.ctx.fillText("final score: ".concat(this.game.points), 150, 200);
@@ -818,6 +913,37 @@ function () {
 }();
 
 module.exports = GameOver;
+
+/***/ }),
+
+/***/ "./lib/opening_message.js":
+/*!********************************!*\
+  !*** ./lib/opening_message.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var openingMessage = function openingMessage(canvas, ctx) {
+  ctx.fillStyle = "#3BD8CE";
+  ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+  ctx.stroke();
+  ctx.font = '41px serif';
+  ctx.fillStyle = 'black';
+  ctx.fillText("Uncle Spinney Dervish", 71, 41);
+  ctx.fillStyle = 'white';
+  ctx.font = '20px serif';
+  ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 + 30);
+  ctx.font = '18px serif';
+  ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 80, canvas.width / 2 - 20);
+  ctx.font = '16px serif';
+  ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 110, canvas.width / 2 - 20);
+  ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 140, canvas.width / 2 - 20);
+  ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 170, canvas.width / 2 - 20);
+  ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 200, canvas.width / 2 - 20);
+  ctx.fillText("Push any button to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
+};
+
+module.exports = openingMessage;
 
 /***/ }),
 
@@ -884,10 +1010,16 @@ function () {
     value: function findImpactAngle() {
       var slopeA = (this.impactBubble.y - this.initialPos.y) / (this.impactBubble.x - this.initialPos.x);
       var slopeB = this.impactBubble.y / this.impactBubble.x;
-      var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
-      var aaaaa = this.radToDeg(Math.atan(tanAng));
-      console.log(aaaaa);
-      return Math.atan(tanAng);
+      var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA); // const aaaaa = this.radToDeg(Math.atan(tanAng))
+      // // console.log(aaaaa);
+
+      console.log(tanAng);
+
+      if (!tanAng) {
+        return 0;
+      } else {
+        return Math.atan(tanAng);
+      }
     }
   }, {
     key: "adjustConstant",
