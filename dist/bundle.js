@@ -549,8 +549,6 @@ function () {
     value: function movingBubble(bubble) {
       var _this4 = this;
 
-      console.log('b4');
-      console.log(this.allBubbles);
       this.drawBubble(bubble);
       this.handleChangeDirection(bubble);
 
@@ -621,8 +619,6 @@ function () {
         this.spinney = null;
         this.newReady();
         this.updateInitialPos(this.readyBubble);
-        console.log('aftr');
-        console.log(this.allBubbles);
       }
     }
   }, {
@@ -803,8 +799,6 @@ function () {
         this.allBubbles.push(newBubble);
         this.misses -= 1;
       }
-
-      console.log(this.misses);
     }
   }, {
     key: "mousePosition",
@@ -900,6 +894,7 @@ function () {
     value: function renderScreen() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.game.renderAllBubbles();
+      this.game.renderLine();
       this.ctx.font = '41px s';
       this.ctx.fillStyle = 'black';
       this.ctx.fillText("game over", 170, 141);
@@ -1006,17 +1001,32 @@ function () {
       return ang * 180 / Math.PI;
     }
   }, {
+    key: "oppositeSign",
+    value: function oppositeSign(a, b) {
+      if (a < 0 && b > 0) {
+        return true;
+      } else if (a > 0 && b < 0) {
+        return true;
+      }
+
+      return false;
+    }
+  }, {
     key: "findImpactAngle",
     value: function findImpactAngle() {
+      debugger;
       var slopeA = (this.impactBubble.y - this.initialPos.y) / (this.impactBubble.x - this.initialPos.x);
       var slopeB = this.impactBubble.y / this.impactBubble.x;
-      var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA); // const aaaaa = this.radToDeg(Math.atan(tanAng))
-      // // console.log(aaaaa);
+      var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
+      var rlAng = Math.atan(tanAng);
+      var aaaaa = this.radToDeg(Math.atan(tanAng)); // // console.log(aaaaa);
 
       console.log(tanAng);
 
       if (!tanAng) {
         return 0;
+      } else if (this.oppositeSign(slopeA, tanAng)) {
+        return -Math.atan(tanAng);
       } else {
         return Math.atan(tanAng);
       }
