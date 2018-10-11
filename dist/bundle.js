@@ -166,67 +166,64 @@ function () {
     value: function makeNewBubbles() {
       var bubs = [];
 
-      for (var i = 0; i < 2; i++) {
+      for (var i = 1; i <= 2; i++) {
         x = 0;
-        y = (i + 1) * 230;
+        y = i * this.game.canvas.height / 3;
         color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
         bubs.push(new Bubble(x, y, color));
       }
 
-      for (var _i = 0; _i < 2; _i++) {
+      for (var _i = 1; _i <= 2; _i++) {
         x = 525;
-        y = (_i + 1) * 230;
+        y = _i * this.game.canvas.height / 3;
         color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
         bubs.push(new Bubble(x, y, color));
       }
 
-      for (var _i2 = 0; _i2 < 2; _i2++) {
-        y = 0;
-        x = (_i2 + 1) * 180;
-        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
-        bubs.push(new Bubble(x, y, color));
-      }
-
-      for (var _i3 = 0; _i3 < 2; _i3++) {
-        y = 600;
-        x = (_i3 + 1) * 180;
-        color = this.game.colors[Math.floor(this.game.colors.length * Math.random())];
-        bubs.push(new Bubble(x, y, color));
-      }
-
+      bubs.push(new Bubble(this.game.canvas.width / 2, 0, this.game.colors[Math.floor(this.game.colors.length * Math.random())]));
+      bubs.push(new Bubble(this.game.canvas.width / 2, 600, this.game.colors[Math.floor(this.game.colors.length * Math.random())]));
       return bubs;
+    }
+  }, {
+    key: "touchesAnotherAddedBubble",
+    value: function touchesAnotherAddedBubble(bubble) {
+      var _this = this;
+
+      return this.bubbles.some(function (bub) {
+        return _this.game.inContactStopMotion(bubble, bub);
+      });
     }
   }, {
     key: "moveEach",
     value: function moveEach() {
-      var _this = this;
+      var _this2 = this;
 
       if (this.bubbles.length === 0) {
         this.game.adder = null;
       }
 
       this.bubbles.forEach(function (bub) {
-        var adjX = bub.x - _this.centerX;
-        var adjY = bub.y - _this.centerY;
+        var adjX = bub.x - _this2.centerX;
+        var adjY = bub.y - _this2.centerY;
         var denominator = Math.sqrt(adjX * adjX + adjY * adjY);
         var dx = 1 * (-adjX / denominator);
         var dy = 1 * (-adjY / denominator);
         bub.x = bub.x + dx;
         bub.y = bub.y + dy;
 
-        _this.game.drawBubble(bub);
+        _this2.game.drawBubble(bub);
 
-        if (_this.game.touchingAnyBubble(bub)) {
-          _this.bubbles.splice(_this.bubbles.indexOf(bub), 1);
+        if (_this2.game.touchingAnyBubble(bub)) {
+          _this2.bubbles.splice(_this2.bubbles.indexOf(bub), 1);
 
-          _this.game.allBubbles.forEach(function (bubble) {
-            if (_this.game.inContactPop(bub, bubble)) {
+          _this2.game.allBubbles.forEach(function (bubble) {
+            if (_this2.game.inContactPop(bub, bubble)) {
               bubble.touching.push(bub);
               bub.touching.push(bubble);
             }
           });
 
-          _this.game.allBubbles.push(bub);
+          _this2.game.allBubbles.push(bub);
         }
       });
     }
@@ -345,7 +342,7 @@ function () {
     this.prevX = null;
     this.prevY = null;
     this.adder = null;
-    this.misses = Math.floor(3 + 3 * Math.random());
+    this.misses = 5;
     this.initialPosition = {
       x: this.canvas.width / 2,
       y: 14
@@ -356,7 +353,7 @@ function () {
   _createClass(Game, [{
     key: "resetMisses",
     value: function resetMisses() {
-      this.misses = Math.floor(3 + 3 * Math.random());
+      this.misses = 3;
     }
   }, {
     key: "resetColors",
@@ -1026,7 +1023,6 @@ function () {
   }, {
     key: "findImpactAngle",
     value: function findImpactAngle() {
-      debugger;
       var slopeA = (this.impactBubble.y - this.initialPos.y) / (this.impactBubble.x - this.initialPos.x);
       var slopeB = this.impactBubble.y / this.impactBubble.x;
       var tanAng = (slopeB - slopeA) / (1 + slopeB * slopeA);
