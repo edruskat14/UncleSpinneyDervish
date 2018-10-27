@@ -230,7 +230,6 @@ function () {
   }, {
     key: "lifeCycle",
     value: function lifeCycle() {
-      // this.game.reRender();
       this.moveEach();
     }
   }]);
@@ -585,19 +584,7 @@ function () {
       if (this.roundOver()) {
         this.newRound();
       }
-    } // handleMisses() {
-    //   this.interval = setInterval(this.missInterval(), 5)
-    //   this.resetMisses();
-    // }
-    // missInterval() {
-    //   this.adder.lifeCycle();
-    //   if (this.adder.bubbles.length === 0) {
-    //     clearInterval(this.interval);
-    //     this.interval = null;
-    //     this.adder = null;
-    //   }
-    // }
-
+    }
   }, {
     key: "setRender",
     value: function setRender() {
@@ -928,13 +915,14 @@ var openingMessage = function openingMessage(canvas, ctx) {
   ctx.font = '20px serif';
   ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 + 30);
   ctx.font = '18px serif';
-  ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 80, canvas.width / 2 - 20);
+  ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 70, canvas.width / 2 - 20);
   ctx.font = '16px serif';
-  ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 110, canvas.width / 2 - 20);
-  ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 140, canvas.width / 2 - 20);
-  ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 170, canvas.width / 2 - 20);
-  ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 200, canvas.width / 2 - 20);
-  ctx.fillText("Press any key to begin", canvas.width / 4 + 41, canvas.height / 4 + 260, canvas.width / 2 - 20);
+  ctx.fillText("Click to fire a bubble.", canvas.width / 4 + 10, canvas.height / 4 + 100, canvas.width / 2 - 20);
+  ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 130, canvas.width / 2 - 20);
+  ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 160, canvas.width / 2 - 20);
+  ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 190, canvas.width / 2 - 20);
+  ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 220, canvas.width / 2 - 20);
+  ctx.fillText("Press any key to begin", canvas.width / 4 + 41, canvas.height / 4 + 270, canvas.width / 2 - 20);
 };
 
 module.exports = openingMessage;
@@ -1079,63 +1067,7 @@ function () {
   return Spinney;
 }();
 
-module.exports = Spinney; //
-// class Spinney {
-//   constructor(canvas, ctx, dx, dy, bubblesArray) {
-//     this.canvas = canvas;
-//     this.ctx = ctx;
-//     this.incDx = dx;
-//     this.incDy = dy;
-//     this.outDx = null;
-//     this.outDy = null;
-//     this.centerX = 263;
-//     this.centerY = 300
-//     this.bubbles = bubblesArray;
-//     this.interval = null;
-//     this.drawBubble = this.drawBubble.bind(this);
-//   }
-//
-//   adjustments(bubble) {
-//     const adjX = bubble.x - this.centerX;
-//     const adjY = bubble.y - this.centerY;
-//     return { x: adjX, y: adjY }
-//   }
-//   findImpactAngle(bubble) {
-//     const justments = this.adjustments(bubble);
-//     const u1 = bubble.x * this.incDx;
-//     const u2 = bubble.y * this.incDy;
-//     const denominator = (Math.sqrt((justments.x * justments.x) + (justments.y * justments.y))) * (Math.sqrt((this.incDx * this.incDx) + (this.incDy * this.incDy)));
-//     const result = ((u1 + u2)  / denominator);
-//     return Math.acos(result);
-//   }
-//   drawBubble(bubble) {
-//     this.ctx.beginPath();
-//     this.ctx.arc(bubble.x, bubble.y, this.bubbleRad, 0, Math.PI*2, false);
-//     this.ctx.fillStyle = `${bubble.color}`;
-//     this.ctx.fill();
-//     this.ctx.closePath();
-//   }
-//
-//   iterateSpin(){
-//     debugger
-//     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-//     this.bubbles.forEach((bub) => {
-//       const angle = this.findImpactAngle(bub);
-//       const dx = Math.sin(angle);
-//       const dy = Math.cos(angle);
-//       bub.x += dx;
-//       bub.y += dy;
-//       this.drawBubble(bub);
-//     })
-//   }
-//
-// }
-// // impacted bubble x and y
-// // tells where the hit is on the circle
-// //
-// // active bubble dx and dy tell direction
-//
-// module.exports = Spinney;
+module.exports = Spinney;
 
 /***/ })
 

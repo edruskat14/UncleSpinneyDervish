@@ -1,20 +1,13 @@
 .main-body {
-  /* align-items: center; */
   background-color: #b2e1e6;
 }
-/* .title {
-  font-size: 18px;
-  font-family: 'Chakra Petch', sans-serif;
-  width: 172px;
-  margin: 0 auto;
-} */
+
 .canvas-div {
   position: relative;
   align-items: center;
   display: block;
   margin: 0 auto;
   width: 527px;
-  /* top: -141px; */
 }
 .canvas {
   position: absolute;
