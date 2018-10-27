@@ -330,7 +330,7 @@ function () {
     this.ctx = ctx;
     this.multiplier = 1;
     this.points = 0;
-    this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+    this.colors = ['red', 'orange', '#ADFF2F', 'purple', 'blue', 'green'];
     this.allBubbles = [];
     this.readyBubble = null;
     this.activeBubble = null;
@@ -357,7 +357,7 @@ function () {
   }, {
     key: "resetColors",
     value: function resetColors() {
-      this.colors = ['red', 'orange', 'yellow', 'purple', 'blue', 'green'];
+      this.colors = ['red', 'orange', '#ADFF2F', 'purple', 'blue', 'green'];
     }
   }, {
     key: "roundOver",
