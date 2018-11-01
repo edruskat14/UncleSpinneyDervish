@@ -1,20 +1,30 @@
 # UncleSpinneyDervish
 
-Background:
-  This will be an attempt to create a game similar to bubble spinner. There is a circle of bubbles in the center of the screen    and the player has one bubble in hand to shoot at the circle. If three of the same color bubble come in contact the three     or more of them will disappear. The goal each round is to eliminate all bubbles. If does not eliminate any bubbles for a certain number of turns then some more will be added to the circle. If a bubble touches the outer edge the player loses.
+[Play the game](http://edruskat14.live/UncleSpinneyDervish/)
 
-  MVPs
-    - Bubbles with traits such as hit boxes and colors.
-    - The main circle made up of a certain number of bubbles.
-    - The starting position and ability for a player to shoot a bubble from there.
-    - The elimination and addition of bubbles
-    - points per bubble
+## Background  
+  This is a browser game based on bubble spinner. There is a blob of bubbles in the center of the screen and the player has one bubble in hand to shoot at the circle. If the player connects three or more of the same color bubble, those bubbles will pop. The goal each round is to eliminate all bubbles. If a bubble in the blob touches the outer edge the player loses.  
 
-  Bonus
-    - The circle spins when hit (the speed and direction depend on the hit)
-    - the bubbles can bounce off walls
-    - High scores
-    - Cool music
+  The Game is build using JavaScript along with Canvas.
+
+## Features
+  When struck by the player's bubble the main bubble blob will spin based on the angle of incidence. This is programmed using algebra and trigonometry.  
+  ```   
+       findImpactAngle() {
+       const slopeA = (this.impactBubble.y - this.initialPos.y)/(this.impactBubble.x - this.initialPos.x);
+       const slopeB = (this.impactBubble.y/this.impactBubble.x)
+       const tanAng = ((slopeB - slopeA) /(1 + slopeB*slopeA));
+       if (!tanAng) {
+         return 0;
+       } else if (this.movingAway()) {
+         return -Math.atan(tanAng);
+       } else {
+         return Math.atan(tanAng);
+       }
+     }
+```  
+This helps determine the initial speed and direction in which the bubble blob spins based on the impact angle of the bubble shot by the player.
+
 
   Wireframe:
     The main idea is to look something like this picture: http://i1-games.softpedia-static.com/screenshots/Bubble-Spinner-2_3.jpg, however if I can be creative perhaps I can alter it a bit.
