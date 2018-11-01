@@ -25,17 +25,24 @@
 ```  
 This helps determine the initial speed and direction in which the bubble blob spins based on the impact angle of the bubble shot by the player.
 
-
-  Wireframe:
-    The main idea is to look something like this picture: http://i1-games.softpedia-static.com/screenshots/Bubble-Spinner-2_3.jpg, however if I can be creative perhaps I can alter it a bit.
-
-  Technologies:
-    I don't expect to need any libraries beyond vanilla JS. THe difficulty will be in creating the physics of the game and the     proper hitboxes of the bubbles.
-
-  Backend:
-    Adding a backend would be nice for high scores. This would just require a high scores table involving a name input by the     user and a score.
-
-  Timeline:
-    A bubble: the first thing will be to design a bubble itself. This will require various colors, the shape will be round and      the interaction between bubbles will be sticking together on contact.  
-    The Board: the second phase will be creating a board which will be a circle of bubble in the center of the screen with          walls around it. The board will shrink and grow as bubbles are eliminated and added.  
-    Actions: The final of the main MVPs will be to create the user's shooting action, the bubble popping action, and the            bubble adding action. The popping will involve gaining points and possibly ending a round. The adding action may lead to      a game over if a bubble touches the side.
+The bubble elimination process uses various breadth first searching algorithms depending on the situation. If the impact bubble connects to two or more of the same color, those bubbles will be popped. Any bubbles who have lost their direct connection to the center will also be popped.
+```
+eliminateEntireTree(bubble) {
+  const choppingBlock = [bubble];
+  const queue = bubble.touching.slice();
+  while (queue.length > 0) {
+    queue[0].touching.forEach((item) => {
+      if (queue.indexOf(item) === -1 && choppingBlock.indexOf(item) === -1) {
+        queue.push(item);
+      }
+    })
+    choppingBlock.push(queue[0]);
+    queue.shift();
+  }
+  choppingBlock.forEach((sacrifice) => {
+    this.destroyBubble(sacrifice);
+    this.points += 1 * this.multiplier;
+  })
+}
+```
+This algorithm eliminates all bubbles connected to a certain bubble. It is used in a case where a bubble is found to have no direct connection to the center. It is careful to not make an attempt to remove the same bubble more than one time.
