@@ -158,7 +158,7 @@ function () {
     this.game = game;
     this.centerX = 263;
     this.centerY = 320;
-    this.bubbles = this.makeNewBubbles();
+    this.bubbles = this.newBubbleAdjusted();
   }
 
   _createClass(BubbleAdder, [{
@@ -183,6 +183,23 @@ function () {
       bubs.push(new Bubble(this.game.canvas.width / 2, 0, this.game.colors[Math.floor(this.game.colors.length * Math.random())]));
       bubs.push(new Bubble(this.game.canvas.width / 2, 600, this.game.colors[Math.floor(this.game.colors.length * Math.random())]));
       return bubs;
+    }
+  }, {
+    key: "newBubbleAdjusted",
+    value: function newBubbleAdjusted() {
+      var adjustmentNumber = this.game.multiplier - 1;
+
+      if (adjustmentNumber === 0) {
+        return [];
+      }
+
+      var newBubbles = this.makeNewBubbles();
+
+      if (adjustmentNumber > 2) {
+        return newBubbles;
+      } else {
+        return newBubbles.slice(0, adjustmentNumber * 2);
+      }
     }
   }, {
     key: "touchesAnotherAddedBubble",
@@ -724,7 +741,7 @@ function () {
 
       var queue = bubble.touching.slice();
       var choppingBlock = [bubble];
-      var islandTesters = [];
+      var testForIsland = [];
       var beenQueued = bubble.touching.slice().concat([bubble]);
 
       while (queue.length > 0) {
@@ -734,12 +751,12 @@ function () {
             if (beenQueued.indexOf(item) === -1 && item.color === bubble.color) {
               queue.push(item);
               beenQueued.push(item);
-            } else if (islandTesters.indexOf(item) === -1 && item.color !== bubble.color) {
-              islandTesters.push(item);
+            } else if (testForIsland.indexOf(item) === -1 && item.color !== bubble.color) {
+              testForIsland.push(item);
             }
           });
-        } else if (islandTesters.indexOf(queue[0]) === -1) {
-          islandTesters.push(queue[0]);
+        } else if (testForIsland.indexOf(queue[0]) === -1) {
+          testForIsland.push(queue[0]);
         }
 
         queue.shift();
@@ -751,7 +768,7 @@ function () {
         _this9.destroyBubble(bubble);
       });
       this.points += 1 * this.multiplier;
-      this.eliminateIslands(islandTesters);
+      this.eliminateIslands(testForIsland);
       this.adjustColorOptions();
     }
   }, {
@@ -1020,9 +1037,7 @@ function () {
       if (!tanAng) {
         return 0;
       } else if (this.movingAway()) {
-        // } else if (this.oppositeSign(slopeA, tanAng) && !this.oppositeSign(this.impactBubble.x, this.incDx)) {
-        return -Math.atan(tanAng); // } else if (this.oppositeSign(slopeA, tanAng) && !this.oppositeSig n(this.impactBubble.y, this.incDy)) {
-        //   return -Math.atan(tanAng);
+        return -Math.atan(tanAng);
       } else {
         return Math.atan(tanAng);
       }
