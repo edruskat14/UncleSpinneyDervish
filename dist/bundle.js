@@ -599,6 +599,7 @@ function () {
       }
 
       if (this.roundOver()) {
+        this.spinney.c = 0;
         this.newRound();
       }
     }
