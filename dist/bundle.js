@@ -806,6 +806,7 @@ function () {
         });
         this.allBubbles.push(newBubble);
         this.misses -= 1;
+        this.playHitSound();
       }
     }
   }, {
@@ -871,6 +872,12 @@ function () {
     value: function playBounceSound() {
       var bounce = new Audio('assets/sounds/bounce.wav');
       bounce.play();
+    }
+  }, {
+    key: "playHitSound",
+    value: function playHitSound() {
+      var hit = new Audio('assets/sounds/hit.mp3');
+      hit.play();
     }
   }]);
 
