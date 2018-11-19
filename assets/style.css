@@ -16,7 +16,8 @@
   height: 600px;
   width: 525px;
   border-radius: 5px;
-  background-color: rgba(235, 235, 235);
+  background: linear-gradient(#ccf2ff, #fff);
+  /* background-color: rgba(235, 235, 235); */
 
 }
 .title {

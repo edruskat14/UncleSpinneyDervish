@@ -553,11 +553,13 @@ function () {
       if (bubble.y + bubble.dy > this.canvas.height - this.bubbleRad || bubble.y + bubble.dy < this.bubbleRad) {
         bubble.dy = -bubble.dy;
         this.updateInitialPos(this.activeBubble);
+        this.playBounceSound();
       }
 
       if (bubble.x + bubble.dx > this.canvas.width - this.bubbleRad || bubble.x + bubble.dx < this.bubbleRad) {
         bubble.dx = -bubble.dx;
         this.updateInitialPos(this.activeBubble);
+        this.playBounceSound();
       }
     }
   }, {
@@ -771,6 +773,7 @@ function () {
       this.points += 1 * this.multiplier;
       this.eliminateIslands(testForIsland);
       this.adjustColorOptions();
+      this.playPopSound();
     }
   }, {
     key: "evaluateCollision",
@@ -856,6 +859,18 @@ function () {
         clearInterval(this.interval);
         this.interval = setInterval(this.dibujar.bind(this), 1);
       }
+    }
+  }, {
+    key: "playPopSound",
+    value: function playPopSound() {
+      var pop = new Audio('assets/sounds/pop.wav');
+      pop.play();
+    }
+  }, {
+    key: "playBounceSound",
+    value: function playBounceSound() {
+      var bounce = new Audio('assets/sounds/bounce.wav');
+      bounce.play();
     }
   }]);
 
