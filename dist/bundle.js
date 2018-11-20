@@ -270,10 +270,22 @@ var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 var openingMessage = __webpack_require__(/*! ./opening_message */ "./lib/opening_message.js");
 
 var opener = true;
+var audioPlay = true;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.width = 525;
 canvas.height = 600;
+
+function toggleSoundPause(audio) {
+  if (audioPlay) {
+    audio.pause();
+    audioPlay = false;
+  } else {
+    audio.play();
+    audioPlay = true;
+  }
+}
+
 openingMessage(canvas, ctx);
 
 var startUp = function startUp(e) {
@@ -287,11 +299,13 @@ var startUp = function startUp(e) {
         if (game.over) {
           game.newGame();
         }
+      } else if (e.key === 'm') {
+        toggleSoundPause(backgroundMusic);
       }
     };
 
     opener = false;
-    backgroundMusic = new Audio('assets/sounds/background.mp3');
+    var backgroundMusic = new Audio('assets/sounds/background.mp3');
     backgroundMusic.addEventListener('ended', function () {
       this.currentTime = 0;
       this.play();
