@@ -301,6 +301,8 @@ var startUp = function startUp(e) {
         }
       } else if (e.key === 'm') {
         toggleSoundPause(backgroundMusic);
+      } else if (e.key === 's') {
+        game.toggleSoundFX();
       }
     };
 
@@ -384,6 +386,7 @@ function () {
       y: 14
     };
     this.over = false;
+    this.soundFX = true;
   }
 
   _createClass(Game, [{
@@ -884,20 +887,35 @@ function () {
   }, {
     key: "playPopSound",
     value: function playPopSound() {
-      var pop = new Audio('assets/sounds/pop.wav');
-      pop.play();
+      if (this.soundFX) {
+        var pop = new Audio('assets/sounds/pop.wav');
+        pop.play();
+      }
     }
   }, {
     key: "playBounceSound",
     value: function playBounceSound() {
-      var bounce = new Audio('assets/sounds/bounce.wav');
-      bounce.play();
+      if (this.soundFX) {
+        var bounce = new Audio('assets/sounds/bounce.wav');
+        bounce.play();
+      }
     }
   }, {
     key: "playHitSound",
     value: function playHitSound() {
-      var hit = new Audio('assets/sounds/hit.mp3');
-      hit.play();
+      if (this.soundFX) {
+        var hit = new Audio('assets/sounds/hit.mp3');
+        hit.play();
+      }
+    }
+  }, {
+    key: "toggleSoundFX",
+    value: function toggleSoundFX() {
+      if (this.soundFX) {
+        this.soundFX = false;
+      } else {
+        this.soundFX = true;
+      }
     }
   }]);
 
@@ -966,23 +984,25 @@ module.exports = GameOver;
 
 var openingMessage = function openingMessage(canvas, ctx) {
   ctx.fillStyle = "#3BD8CE";
-  ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+  ctx.fillRect(canvas.width / 6, canvas.height / 8, 2 * canvas.width / 3, 3 * canvas.height / 4);
   ctx.stroke();
   ctx.font = '41px serif';
   ctx.fillStyle = 'black';
   ctx.fillText("Uncle Spinney Dervish", 71, 41);
   ctx.fillStyle = 'white';
   ctx.font = '20px serif';
-  ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 + 30);
+  ctx.fillText("Welcome to U.S.D.", canvas.width / 4 + 50, canvas.height / 4 - 20);
   ctx.font = '18px serif';
-  ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 70, canvas.width / 2 - 20);
+  ctx.fillText("The rules are simple:", canvas.width / 4 + 10, canvas.height / 4 + 10);
   ctx.font = '16px serif';
-  ctx.fillText("Click to fire a bubble.", canvas.width / 4 + 10, canvas.height / 4 + 100, canvas.width / 2 - 20);
-  ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 130, canvas.width / 2 - 20);
-  ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 160, canvas.width / 2 - 20);
-  ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 190, canvas.width / 2 - 20);
-  ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 220, canvas.width / 2 - 20);
-  ctx.fillText("Press any key to begin", canvas.width / 4 + 41, canvas.height / 4 + 270, canvas.width / 2 - 20);
+  ctx.fillText("Click to fire a bubble.", canvas.width / 4 + 10, canvas.height / 4 + 40);
+  ctx.fillText("Connect three or more bubbles of the", canvas.width / 4 + 10, canvas.height / 4 + 70);
+  ctx.fillText("same color to pop them (Bouncing off", canvas.width / 4 + 10, canvas.height / 4 + 100);
+  ctx.fillText("walls is encouraged). If the main", canvas.width / 4 + 10, canvas.height / 4 + 130);
+  ctx.fillText("bubble blob hits a wall you lose.", canvas.width / 4 + 10, canvas.height / 4 + 160);
+  ctx.fillText("Press M to mute music.", canvas.width / 4 + 10, canvas.height / 4 + 210);
+  ctx.fillText("Press S to mute sound effects.", canvas.width / 4 + 10, canvas.height / 4 + 250);
+  ctx.fillText("Press any key to begin", canvas.width / 4 + 41, canvas.height / 4 + 300);
 };
 
 module.exports = openingMessage;
