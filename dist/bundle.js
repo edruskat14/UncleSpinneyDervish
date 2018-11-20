@@ -289,20 +289,21 @@ function toggleSoundPause(audio) {
 openingMessage(canvas, ctx);
 
 var startUp = function startUp(e) {
-  e.preventDefault();
-
+  // e.preventDefault();
   if (opener === true) {
     var checkKey = function checkKey(e) {
-      e.preventDefault();
+      if (!window.form) {
+        e.preventDefault();
 
-      if (e.key === " ") {
-        if (game.over) {
-          game.newGame();
+        if (e.key === " ") {
+          if (game.over) {
+            game.newGame();
+          }
+        } else if (e.key === 'm') {
+          toggleSoundPause(backgroundMusic);
+        } else if (e.key === 's') {
+          game.toggleSoundFX();
         }
-      } else if (e.key === 'm') {
-        toggleSoundPause(backgroundMusic);
-      } else if (e.key === 's') {
-        game.toggleSoundFX();
       }
     };
 
@@ -358,6 +359,8 @@ var Spinney = __webpack_require__(/*! ./spinney */ "./lib/spinney.js");
 var GameOver = __webpack_require__(/*! ./game_over */ "./lib/game_over.js");
 
 var BubbleAdder = __webpack_require__(/*! ./bubble_adder */ "./lib/bubble_adder.js");
+
+var DervishMain = __webpack_require__(/*! ./dervish_main */ "./lib/dervish_main.js");
 
 var Game =
 /*#__PURE__*/
@@ -416,6 +419,7 @@ function () {
   }, {
     key: "startAnew",
     value: function startAnew() {
+      document.getElementById('high-score-form').hidden = true;
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.allBubbles = [];
       this.resetColors();
@@ -436,8 +440,11 @@ function () {
   }, {
     key: "endTheGame",
     value: function endTheGame() {
+      window.form = true;
       this.over = true;
       new GameOver(this);
+      window.score = this.points;
+      document.getElementById('high-score-form').hidden = false;
     }
   }, {
     key: "newGame",
@@ -964,7 +971,7 @@ function () {
       this.ctx.fillText("game over", 170, 141);
       this.ctx.fillText("final score: ".concat(this.game.points), 150, 200);
       this.ctx.font = '20px Papyrus';
-      this.ctx.fillText('Push space to play again', 159, 400);
+      this.ctx.fillText('Push space to play again', 159, 500);
     }
   }]);
 

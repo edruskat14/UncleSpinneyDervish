@@ -6,6 +6,38 @@
   <link rel="stylesheet" href="assets/style.css">
   <link href="https://fonts.googleapis.com/css?family=Chakra+Petch" rel="stylesheet">
 
+  <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+  <!-- <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-firestore.js"></script> -->
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCdN8LSYVawuwFQGZJOggiCCYY8eUXal7c",
+      authDomain: "uncle-spinney-dervish.firebaseapp.com",
+      databaseURL: "https://uncle-spinney-dervish.firebaseio.com",
+      projectId: "uncle-spinney-dervish",
+      storageBucket: "uncle-spinney-dervish.appspot.com",
+      messagingSenderId: "353438144617"
+    };
+    firebase.initializeApp(config);
+
+    function savetoHighScores() {
+      const newScore = {};
+      newScore.name = document.getElementById('name').value;
+      newScore.score = window.score;
+      firebase.database().ref('highscores').push(newScore);
+      document.getElementById('high-score-form').hidden = true;
+      window.form = false;
+    }
+    function dontSaveToHighScores() {
+      document.getElementById('high-score-form').hidden = true;
+      window.form = false;
+    }
+    function fetchHighScores() {
+      const highScores = firebase.database().ref('highscores');
+    }
+  </script>
+
 </head>
 <body class='main-body' height='300' width='150'>
 
@@ -19,6 +51,12 @@
       <a class='nav-link' href='https://www.linkedin.com/in/ethan-druskat/' target='_blank'>Linkedin</a>
       <a class='nav-link' href='https://edruskat14.live/' target='_blank'>Portfolio</a>
     </nav>
+    <div class='high-score-div' id='high-score-form' hidden>
+      <h3 class='high-score-title'>Submit Your Score</h3>
+      <input class='high-score-name' type='text' id='name' placeholder="Name"/>
+      <input class='high-score-submit' type='button' onclick="savetoHighScores()" value='Save' />
+      <input class='high-score-no-thanks' type='button' onclick="dontSaveToHighScores()" value='No Thanks' />
+    </div>
   </div>
   <script src='./dist/bundle.js' class='board'>
   </script>

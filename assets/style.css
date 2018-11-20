@@ -59,3 +59,37 @@
   margin-bottom: 30px;
   text-decoration: none;
 }
+
+.high-score-div {
+  position: absolute;
+  top: 275px;
+  left: 170px;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+}
+.high-score-title {
+
+}
+.high-score-name {
+  height: 25px;
+  border-radius: 3px;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 8px;
+}
+.high-score-submit {
+  border-radius: 3px;
+}
+.high-score-submit:hover {
+  background-color: blue;
+  color: #fff;
+}
+.high-score-no-thanks {
+  border-radius: 3px;
+}
+.high-score-no-thanks:hover {
+  background-color: blue;
+  color: #fff;
+}
