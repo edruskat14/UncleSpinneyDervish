@@ -291,6 +291,12 @@ var startUp = function startUp(e) {
     };
 
     opener = false;
+    backgroundMusic = new Audio('assets/sounds/background.mp3');
+    backgroundMusic.addEventListener('ended', function () {
+      this.currentTime = 0;
+      this.play();
+    }, false);
+    backgroundMusic.play();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var game = new Game(canvas, ctx);
     canvas.addEventListener('mousemove', function () {
