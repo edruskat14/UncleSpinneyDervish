@@ -93,3 +93,30 @@
   background-color: blue;
   color: #fff;
 }
+.high-score-display {
+  text-align: center;
+  background: linear-gradient(#fff, #ccf2ff);
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 10px;
+  position: absolute;
+  top: 170px;
+  left: 540px;
+  width: 250px;
+  height: 350px;
+}
+.high-score-list {
+  list-style: none;
+}
+.high-score-list-ele {
+  display: flex;
+  margin: 20px 0;
+}
+.high-score-name {
+  font-family: sans-serif, serif;
+}
+.high-score-score {
+  font-family: 'Chakra Petch', sans-serif;
+  position: absolute;
+  left: 150px;
+}
