@@ -384,6 +384,7 @@ function () {
     this.prevY = null;
     this.adder = null;
     this.misses = 5;
+    this.wallHits = 0;
     this.initialPosition = {
       x: this.canvas.width / 2,
       y: 14
@@ -584,18 +585,34 @@ function () {
         bubble.dy = -bubble.dy;
         this.updateInitialPos(this.activeBubble);
         this.playBounceSound();
+        this.wallHits += 1;
       }
 
       if (bubble.x + bubble.dx > this.canvas.width - this.bubbleRad || bubble.x + bubble.dx < this.bubbleRad) {
         bubble.dx = -bubble.dx;
         this.updateInitialPos(this.activeBubble);
         this.playBounceSound();
+        this.wallHits += 1;
       }
+    }
+  }, {
+    key: "handleTooManyWallHits",
+    value: function handleTooManyWallHits(bubble) {
+      this.playPopSound();
+      clearInterval(this.interval);
+      this.wallHits = 0;
+      this.reRender();
+      this.newReady();
     }
   }, {
     key: "movingBubble",
     value: function movingBubble(bubble) {
       var _this4 = this;
+
+      if (this.wallHits > 10) {
+        this.handleTooManyWallHits(bubble);
+        return;
+      }
 
       this.drawBubble(bubble);
       this.handleChangeDirection(bubble);
@@ -810,6 +827,7 @@ function () {
     value: function evaluateCollision(newBubble) {
       var _this10 = this;
 
+      this.wallHits = 0;
       var contacted = [];
       this.allBubbles.forEach(function (oldBubble) {
         if (_this10.inContactPop(oldBubble, newBubble)) {
