@@ -1100,7 +1100,7 @@ function () {
       var prev = this.prevPos;
       var currentLength = Math.sqrt(current.x * current.x + current.y * current.y);
       var prevLength = Math.sqrt(prev.x * prev.x + prev.y * prev.y);
-      return prevLength < currentLength;
+      return prevLength <= currentLength;
     }
   }, {
     key: "oppositeSign",
