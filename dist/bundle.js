@@ -258,6 +258,58 @@ module.exports = BubbleAdder;
 
 /***/ }),
 
+/***/ "./lib/bubble_populate.js":
+/*!********************************!*\
+  !*** ./lib/bubble_populate.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var BubblePopulate =
+/*#__PURE__*/
+function () {
+  function BubblePopulate(game) {
+    _classCallCheck(this, BubblePopulate);
+
+    this.game = game;
+  }
+
+  _createClass(BubblePopulate, [{
+    key: "populateBubbles",
+    value: function populateBubbles() {
+      var vert = 210;
+
+      for (var i = -5; i < 6; i++) {
+        var hori = 188 - 12.5 * (4 - Math.abs(i));
+        var lel = 11 - Math.abs(i);
+
+        for (var j = lel; j > 0; j--) {
+          var initBubble = new Bubble(hori, vert, this.colors[Math.floor(this.colors.length * Math.random())]);
+          this.initialEvaluation(initBubble);
+          this.allBubbles.push(initBubble);
+          hori += 25;
+        }
+
+        vert += 22;
+      }
+
+      this.allBubbles[45].color = 'silver';
+      var nwA = new BubbleAdder(this);
+      nwA.makeNewBubbles();
+    }
+  }]);
+
+  return BubblePopulate;
+}();
+
+/***/ }),
+
 /***/ "./lib/dervish_main.js":
 /*!*****************************!*\
   !*** ./lib/dervish_main.js ***!
@@ -361,6 +413,8 @@ var GameOver = __webpack_require__(/*! ./game_over */ "./lib/game_over.js");
 var BubbleAdder = __webpack_require__(/*! ./bubble_adder */ "./lib/bubble_adder.js");
 
 var DervishMain = __webpack_require__(/*! ./dervish_main */ "./lib/dervish_main.js");
+
+var BubblePopulate = __webpack_require__(/*! ./bubble_populate */ "./lib/bubble_populate.js");
 
 var Game =
 /*#__PURE__*/
@@ -508,8 +562,6 @@ function () {
       }
 
       this.allBubbles[45].color = 'silver';
-      var nwA = new BubbleAdder(this);
-      nwA.makeNewBubbles();
     }
   }, {
     key: "drawBubble",
