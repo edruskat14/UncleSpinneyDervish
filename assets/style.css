@@ -31,34 +31,36 @@
   width: 200px;
   transform: rotate(-41deg);
   top: 14px;
-  left: -114px;
+  left: -128px;
 }
 .two {
   position: relative;
   width: 200px;
-  transform: rotate(41deg);
-  top: -136px;
-  left: 449px;
+  transform: rotate(21deg);
+  top: -156px;
+  left: 480px;
 }
 .three {
   position: relative;
   width: 200px;
   top: 314px;
   left: 123px;
+  color: #fff;
 }
 .all-nav {
   font-family: 'Chakra Petch', sans-serif;
   font-size: 25px;
-  display: block;
-  width: 100px;
+  display: flex;
+  width: 300px;
   position: relative;
-  top: -260px;
-  left: -120px;
+  top: -460px;
+  left: 60px;
 }
 .nav-link {
   display: block;
-  margin-bottom: 30px;
+  margin: 0 12px 0 30px;
   text-decoration: none;
+  color: black;
 }
 
 .high-score-div {
