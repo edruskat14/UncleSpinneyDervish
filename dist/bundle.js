@@ -263,13 +263,15 @@ module.exports = BubbleAdder;
   !*** ./lib/bubble_populate.js ***!
   \********************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Bubble = __webpack_require__(/*! ./bubble */ "./lib/bubble.js");
 
 var BubblePopulate =
 /*#__PURE__*/
@@ -278,11 +280,43 @@ function () {
     _classCallCheck(this, BubblePopulate);
 
     this.game = game;
+    this.populateBubbles();
   }
 
   _createClass(BubblePopulate, [{
     key: "populateBubbles",
     value: function populateBubbles() {
+      if (this.game.multiplier === 1) {
+        this.firstRound();
+      } else {
+        this.subsequentRounds();
+      }
+    }
+  }, {
+    key: "firstRound",
+    value: function firstRound() {
+      var vert = 254;
+
+      for (var i = -3; i < 4; i++) {
+        var hori = 188 - 12.5 * (0 - Math.abs(i));
+        var lel = 7 - Math.abs(i);
+
+        for (var j = lel; j > 0; j--) {
+          var initBubble = new Bubble(hori, vert, this.game.colors[Math.floor(this.game.colors.length * Math.random())]);
+          this.game.initialEvaluation(initBubble);
+          this.game.allBubbles.push(initBubble);
+          hori += 25;
+        }
+
+        vert += 22;
+      }
+
+      this.game.allBubbles[18].color = 'silver';
+      console.log(this.game.allBubbles);
+    }
+  }, {
+    key: "subsequentRounds",
+    value: function subsequentRounds() {
       var vert = 210;
 
       for (var i = -5; i < 6; i++) {
@@ -290,23 +324,23 @@ function () {
         var lel = 11 - Math.abs(i);
 
         for (var j = lel; j > 0; j--) {
-          var initBubble = new Bubble(hori, vert, this.colors[Math.floor(this.colors.length * Math.random())]);
-          this.initialEvaluation(initBubble);
-          this.allBubbles.push(initBubble);
+          var initBubble = new Bubble(hori, vert, this.game.colors[Math.floor(this.game.colors.length * Math.random())]);
+          this.game.initialEvaluation(initBubble);
+          this.game.allBubbles.push(initBubble);
           hori += 25;
         }
 
         vert += 22;
       }
 
-      this.allBubbles[45].color = 'silver';
-      var nwA = new BubbleAdder(this);
-      nwA.makeNewBubbles();
+      this.game.allBubbles[45].color = 'silver';
     }
   }]);
 
   return BubblePopulate;
 }();
+
+module.exports = BubblePopulate;
 
 /***/ }),
 
@@ -318,6 +352,8 @@ function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 var Game = __webpack_require__(/*! ./game */ "./lib/game.js");
+
+var BubblePopulate = __webpack_require__(/*! ./bubble_populate */ "./lib/bubble_populate.js");
 
 var openingMessage = __webpack_require__(/*! ./opening_message */ "./lib/opening_message.js");
 
@@ -377,7 +413,7 @@ var startUp = function startUp(e) {
     document.addEventListener('keypress', function () {
       return checkKey(event);
     }, false);
-    game.populateBubbles();
+    var popo = new BubblePopulate(game);
     game.renderAllBubbles();
     game.renderScore();
     game.renderLine();
@@ -478,7 +514,7 @@ function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.allBubbles = [];
       this.resetColors();
-      this.populateBubbles();
+      var populate = new BubblePopulate(this);
       this.renderAllBubbles();
       this.renderScore();
       this.renderLine();
