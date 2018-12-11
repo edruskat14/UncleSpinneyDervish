@@ -29,21 +29,21 @@
 .one{
   position: relative;
   width: 200px;
-  transform: rotate(-41deg);
-  top: 14px;
-  left: -128px;
+  /* transform: rotate(-41deg); */
+  top: -25px;
+  left: -160px;
 }
 .two {
   position: relative;
   width: 200px;
-  transform: rotate(21deg);
-  top: -156px;
+  /* transform: rotate(21deg); */
+  top: -183px;
   left: 480px;
 }
 .three {
   position: relative;
   width: 200px;
-  top: 314px;
+  top: 324px;
   left: 123px;
   color: #fff;
 }
