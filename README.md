@@ -25,8 +25,14 @@
 ```  
 This helps determine the initial speed and direction in which the bubble blob spins based on the impact angle of the bubble shot by the player.
 
+<br>
+<br>
+
 If the player's bubble connects two or more bubbles of its own color those bubbles will pop.  
 ![](https://media.giphy.com/media/5Ye6vg05KlFGSVKAfx/giphy.gif)
+
+<br>
+<br>
 
 The bubble elimination process uses various breadth first searching algorithms depending on the situation. If the impact bubble connects to two or more of the same color, those bubbles will be popped. Any bubbles who have lost their direct connection to the center will also be popped.
 ```
