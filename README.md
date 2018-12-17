@@ -53,5 +53,5 @@ This algorithm eliminates all bubbles connected to a certain bubble. It is used 
 
 
 
-Adds bubbles to increase difficulty.  
+As the player advances to higher rounds, bubbles will occasionally be added to the main blob to add uncertainty and increase difficulty.   
 ![](https://media.giphy.com/media/3HJ57ML5MREWOUqdrG/giphy.gif)
