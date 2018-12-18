@@ -3,9 +3,9 @@
 [Play the game](http://edruskat14.live/UncleSpinneyDervish/)
 
 ## Background  
-  This is a browser game based on bubble spinner. There is a blob of bubbles in the center of the screen and the player has one bubble in hand to shoot at the circle. If the player connects three or more of the same color bubble, those bubbles will pop. The goal each round is to eliminate all bubbles. If a bubble in the blob touches the outer edge the player loses.  
+  This is a browser game based on bubble spinner. There is a blob of bubbles in the center of the screen and the player has one bubble in hand to shoot at the blob. If the player connects three or more of the same color bubble, those bubbles will pop. The goal each round is to eliminate all bubbles. If all bubbles are eliminated the player moves on to the next round where each bubble is worth more when popped. If a bubble in the blob touches the outer edge the game is over.  
 
-  The Game is build using JavaScript along with Canvas.
+  The Game is built using JavaScript along with Canvas.
 
 ## Features
   When struck by the player's bubble the main bubble blob will spin based on the angle of incidence. This is programmed using algebra and trigonometry.  
